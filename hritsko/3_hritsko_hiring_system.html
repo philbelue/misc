@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiring System — Hritsko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; background: #f5f4f0; color: #1a1a1a; padding-bottom: 80px; }
+
+/* ── BANNER ── */
+.banner { background: #0c0c0c; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 200; }
+.banner img { height: 28px; }
+.banner-meta { text-align: right; }
+.banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .08em; display: block; }
+.banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; display: block; }
+
+/* ── NAV ── */
+.nav { background: #fff; border-bottom: 1px solid #e2e1dc; position: sticky; top: 64px; z-index: 199; display: flex; padding: 0 32px; overflow-x: auto; }
+.nav-tab { font-size: 13px; font-weight: 500; color: #8a8a85; padding: 14px 20px; cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap; user-select: none; flex-shrink: 0; }
+.nav-tab:hover { color: #1a1a1a; }
+.nav-tab.active { color: #1a1a1a; border-bottom-color: #0c0c0c; }
+
+/* ── LAYOUT ── */
+.tab-pane { display: none; max-width: 960px; margin: 0 auto; padding: 40px 32px; }
+.tab-pane.active { display: block; }
+
+/* ── TYPOGRAPHY ── */
+.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #b8b7b2; margin-bottom: 6px; }
+.section-title { font-size: 16px; font-weight: 600; color: #1a1a1a; padding-bottom: 10px; border-bottom: 1px solid #e2e1dc; margin-bottom: 20px; }
+.body-text { font-size: 13px; color: #4a4948; line-height: 1.65; margin-bottom: 16px; }
+
+/* ── CARDS ── */
+.card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 22px; margin-bottom: 16px; }
+.card-sm { background: #fff; border: 1px solid #e2e1dc; border-radius: 8px; padding: 16px 18px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+/* ── CALLOUTS ── */
+.callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 14px; }
+.callout-green  { border-color: #25a05e; background: #eaf5f0; color: #1a6e42; }
+.callout-blue   { border-color: #2e6cc4; background: #eaf0f9; color: #1a4f8a; }
+.callout-amber  { border-color: #c8880e; background: #fdf5e6; color: #7a4d08; }
+.callout-red    { border-color: #cc3333; background: #fdf0f0; color: #8a1f1f; }
+.callout-purple { border-color: #6e48c0; background: #f2eefb; color: #4a2880; }
+.callout-teal   { border-color: #1a9090; background: #e8f6f6; color: #0d5c5c; }
+.callout strong { display: block; margin-bottom: 3px; font-weight: 600; }
+.callout p, .callout span { font-size: 13px; }
+
+/* ── TABLES ── */
+.table-wrap { border: 1px solid #e2e1dc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead tr { background: #0c0c0c; }
+thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,.5); padding: 11px 14px; text-align: left; letter-spacing: .06em; text-transform: uppercase; font-weight: 400; }
+tbody tr { border-bottom: 1px solid #e2e1dc; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f5f4f0; }
+tbody td { padding: 12px 14px; font-size: 13px; color: #4a4948; vertical-align: top; }
+td.key { font-weight: 500; color: #1a1a1a; }
+td.mono { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8a8a85; }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; border: 1px solid; }
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.badge-green  { color:#1a6e42; background:#eaf5f0; border-color:#a8dcc0; } .badge-green::before  { background:#25a05e; }
+.badge-amber  { color:#7a4d08; background:#fdf5e6; border-color:#f0d080; } .badge-amber::before  { background:#c8880e; }
+.badge-red    { color:#8a1f1f; background:#fdf0f0; border-color:#f0aaaa; } .badge-red::before    { background:#cc3333; }
+.badge-blue   { color:#1a4f8a; background:#eaf0f9; border-color:#a8c4e8; } .badge-blue::before   { background:#2e6cc4; }
+.badge-purple { color:#4a2880; background:#f2eefb; border-color:#c4aeed; } .badge-purple::before { background:#6e48c0; }
+.badge-teal   { color:#0d5c5c; background:#e8f6f6; border-color:#90d0d0; } .badge-teal::before   { background:#1a9090; }
+.badge-gray   { color:#4a4948; background:#f4f4f1; border-color:#ddddd8; } .badge-gray::before   { background:#8a8a85; }
+
+/* ── STAKEHOLDER BLOCKS ── */
+.stakeholder-block { border-radius: 10px; border: 1px solid; padding: 22px; margin-bottom: 20px; }
+.stakeholder-block.purple { border-color: #c4aeed; background: #f9f7fe; }
+.stakeholder-block.teal   { border-color: #90d0d0; background: #f0fafa; }
+.stakeholder-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px; flex-shrink: 0; }
+.avatar-purple { background: #6e48c0; color: #fff; }
+.avatar-teal   { background: #1a9090; color: #fff; }
+.stakeholder-name { font-weight: 600; font-size: 15px; }
+.stakeholder-role { font-size: 12px; color: #8a8a85; margin-top: 1px; }
+
+/* WHY THIS EXISTS ── 3-col */
+.why-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.why-col { border-radius: 8px; padding: 14px 16px; }
+.why-col-green  { background: #eaf5f0; border: 1px solid #a8dcc0; }
+.why-col-blue   { background: #eaf0f9; border: 1px solid #a8c4e8; }
+.why-col-purple { background: #f2eefb; border: 1px solid #c4aeed; }
+.why-col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; font-weight: 500; }
+.why-col-green  .why-col-label { color: #25a05e; }
+.why-col-blue   .why-col-label { color: #2e6cc4; }
+.why-col-purple .why-col-label { color: #6e48c0; }
+.why-col p { font-size: 13px; line-height: 1.55; }
+.why-col-green  p { color: #1a6e42; }
+.why-col-blue   p { color: #1a4f8a; }
+.why-col-purple p { color: #4a2880; }
+
+/* STATUS LIST */
+.status-list { list-style: none; }
+.status-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #f0efea; font-size: 13px; }
+.status-item:last-child { border-bottom: none; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.dot-green  { background: #25a05e; }
+.dot-amber  { background: #c8880e; }
+.dot-gray   { background: #d0d0cc; border: 1.5px solid #b8b7b2; }
+.dot-red    { background: #cc3333; }
+
+/* OWNERSHIP LADDER */
+.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+.ladder-phase { border-radius: 8px; overflow: hidden; border: 1px solid #e2e1dc; }
+.ladder-header { padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+.ladder-phase:nth-child(1) .ladder-header { background: #0c0c0c; color: rgba(255,255,255,.7); border-bottom: 3px solid #1a9090; }
+.ladder-phase:nth-child(2) .ladder-header { background: #0c0c0c; color: rgba(255,255,255,.7); border-bottom: 3px solid #c8880e; }
+.ladder-phase:nth-child(3) .ladder-header { background: #0c0c0c; color: rgba(255,255,255,.7); border-bottom: 3px solid #6e48c0; }
+.ladder-body { padding: 12px 14px; background: #fff; }
+.ladder-item { font-size: 12px; color: #4a4948; padding: 4px 0; border-bottom: 1px solid #f5f4f0; }
+.ladder-item:last-child { border-bottom: none; }
+
+/* ── PHASE BLOCKS (dividers in content) ── */
+.phase-header { background: #0c0c0c; border-radius: 8px; padding: 12px 18px; margin-bottom: 0; }
+.phase-header-title { font-weight: 600; font-size: 14px; color: #fff; }
+.phase-header-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; letter-spacing: .06em; }
+.phase-body { background: #fff; border: 1px solid #e2e1dc; border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; margin-bottom: 24px; }
+
+/* ── CHECKLIST ITEMS ── */
+.check-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 18px; border-bottom: 1px solid #f0efea; cursor: pointer; transition: background .1s; }
+.check-item:last-child { border-bottom: none; }
+.check-item:hover { background: #fafaf8; }
+.check-box { width: 18px; height: 18px; border: 1.5px solid #d0cfca; border-radius: 4px; flex-shrink: 0; margin-top: 2px; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+.check-box.checked { background: #0c0c0c; border-color: #0c0c0c; }
+.check-box.checked::after { content: '✓'; color: #fff; font-size: 11px; }
+.check-label strong { display: block; font-size: 13px; font-weight: 500; color: #1a1a1a; }
+.check-label span { font-size: 12px; color: #8a8a85; display: block; margin-top: 2px; }
+.check-item.done .check-label strong { color: #b8b7b2; text-decoration: line-through; }
+
+/* GATE CHIPS */
+.gate { display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 4px 10px; border: 1px solid; margin-top: 8px; letter-spacing: .04em; }
+.gate-amber { color: #7a4d08; background: #fdf5e6; border-color: #f0d080; }
+.gate-green { color: #1a6e42; background: #eaf5f0; border-color: #a8dcc0; }
+
+/* ── META FIELDS ── */
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.meta-field { background: #fff; border: 1px solid #e2e1dc; border-radius: 8px; padding: 12px 14px; }
+.meta-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.meta-input { width: 100%; border: none; border-bottom: 1px solid #e2e1dc; padding: 4px 0; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #1a1a1a; background: transparent; outline: none; }
+.meta-input:focus { border-bottom-color: #0c0c0c; }
+
+/* ── SCORE TABLE ── */
+.score-section-row td { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,.4) !important; letter-spacing: .12em; text-transform: uppercase; padding: 8px 14px !important; font-weight: 400; background: #0c0c0c; }
+.score-label-cell strong { display: block; font-size: 13px; font-weight: 500; color: #1a1a1a; }
+.score-label-cell span  { font-size: 12px; color: #8a8a85; display: block; margin-top: 2px; }
+.score-boxes { display: flex; gap: 5px; }
+.score-box { width: 32px; height: 32px; border: 1px solid #e2e1dc; border-radius: 6px; background: #f5f4f0; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: #8a8a85; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+.score-box:hover { border-color: #0c0c0c; color: #1a1a1a; }
+.score-box.selected { background: #0c0c0c; color: #fff; border-color: #0c0c0c; }
+.notes-field { width: 100%; border: 1px solid #e2e1dc; border-radius: 6px; padding: 7px 10px; font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a1a; background: #fafaf8; resize: none; outline: none; }
+.notes-field:focus { border-color: #8a8a85; }
+
+/* ── SCORE TOTALS ── */
+.total-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+.total-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 18px 20px; }
+.total-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+.total-score { font-size: 38px; font-weight: 600; color: #0c0c0c; font-family: 'IBM Plex Mono', monospace; }
+.total-denom { font-size: 16px; color: #8a8a85; }
+.total-scale { font-size: 12px; color: #8a8a85; margin-top: 6px; }
+.rec-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.rec-btn { padding: 8px 16px; border: 1px solid #e2e1dc; border-radius: 6px; font-size: 13px; font-weight: 500; color: #4a4948; cursor: pointer; background: #fff; transition: all .15s; }
+.rec-btn:hover { border-color: #0c0c0c; color: #0c0c0c; }
+.rec-btn.sel-hire   { background: #0c0c0c; color: #fff; border-color: #0c0c0c; }
+.rec-btn.sel-second { background: #fdf5e6; color: #7a4d08; border-color: #f0d080; }
+.rec-btn.sel-pass   { background: #fdf0f0; color: #8a1f1f; border-color: #f0aaaa; }
+
+/* DQ ITEMS */
+.dq-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0efea; }
+.dq-item:last-child { border-bottom: none; }
+.dq-dot { width: 6px; height: 6px; border-radius: 50%; background: #cc3333; margin-top: 7px; flex-shrink: 0; }
+
+/* QUESTION CARDS */
+.q-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; margin-bottom: 18px; overflow: hidden; }
+.q-header { background: #0c0c0c; padding: 14px 20px; display: flex; align-items: baseline; gap: 12px; }
+.q-num  { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(255,255,255,.3); flex-shrink: 0; }
+.q-text { font-size: 14px; font-weight: 600; color: #fff; }
+.q-body { display: grid; grid-template-columns: 1fr 1fr; }
+.q-col  { padding: 16px 18px; }
+.q-col-green { background: #eaf5f0; border-right: 1px solid #e2e1dc; }
+.q-col-red   { background: #fdf0f0; }
+.q-col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+.q-col-green .q-col-label { color: #25a05e; }
+.q-col-red   .q-col-label { color: #cc3333; }
+.q-col p { font-size: 13px; line-height: 1.55; }
+.q-col-green p { color: #1a6e42; }
+.q-col-red   p { color: #8a1f1f; }
+.q-notes { border-top: 1px solid #e2e1dc; padding: 10px 18px; background: #fafaf8; display: flex; align-items: center; gap: 10px; }
+.q-notes-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; text-transform: uppercase; letter-spacing: .1em; flex-shrink: 0; }
+.q-notes input { flex: 1; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 13px; color: #1a1a1a; outline: none; }
+
+/* PROGRESS BAR */
+.progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8a8a85; margin-bottom: 6px; }
+.progress-wrap  { background: #f0efea; border-radius: 4px; height: 6px; margin-bottom: 28px; overflow: hidden; }
+.progress-fill  { height: 100%; background: #0c0c0c; border-radius: 4px; transition: width .3s; width: 0%; }
+
+/* VERDICT GRID */
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.verdict-card { border-radius: 10px; padding: 18px 20px; }
+.verdict-green { background: #eaf5f0; border: 1px solid #a8dcc0; }
+.verdict-red   { background: #fdf0f0; border: 1px solid #f0aaaa; }
+.verdict-title { font-weight: 600; font-size: 13px; margin-bottom: 12px; }
+.verdict-green .verdict-title { color: #1a6e42; }
+.verdict-red   .verdict-title { color: #8a1f1f; }
+.verdict-item { display: flex; gap: 8px; margin-bottom: 7px; font-size: 13px; }
+.v-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+.verdict-green .v-dot { background: #25a05e; } .verdict-green .verdict-item { color: #1a6e42; }
+.verdict-red   .v-dot { background: #cc3333; } .verdict-red   .verdict-item { color: #8a1f1f; }
+
+/* TEXTAREA */
+.textarea-field { width: 100%; border: 1px solid #e2e1dc; border-radius: 6px; padding: 9px 11px; font-family: 'Inter', sans-serif; font-size: 13px; color: #1a1a1a; background: #fafaf8; resize: none; outline: none; margin-top: 6px; }
+.textarea-field:focus { border-color: #8a8a85; }
+.field-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; margin-top: 14px; display: block; }
+
+/* VERDICT BUTTONS */
+.verdict-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.v-btn { padding: 9px 18px; border: 1px solid #e2e1dc; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; background: #fff; color: #4a4948; transition: all .15s; }
+.v-btn:hover { border-color: #0c0c0c; color: #0c0c0c; }
+
+/* RHYTHM */
+.rhythm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.rhythm-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 16px 18px; }
+.rhythm-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.rhythm-item { font-size: 13px; color: #4a4948; padding: 5px 0; border-bottom: 1px solid #f5f4f0; }
+.rhythm-item:last-child { border-bottom: none; }
+
+/* SPACER */
+.gap { margin-top: 28px; }
+.gap-sm { margin-top: 16px; }
+
+/* ── FOOTER ── */
+.footer { background: #0c0c0c; position: fixed; bottom: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 200; }
+.footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,.25); }
+
+@media print {
+  .nav, .footer { display: none; }
+  .banner { position: relative; }
+  .tab-pane { display: block !important; page-break-before: always; }
+  .tab-pane:first-of-type { page-break-before: auto; }
+  body { padding-bottom: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BANNER
+════════════════════════════════════════════════════════════════ -->
+<div class="banner">
+  <img id="logo" src="" alt="Hritsko">
+  <div class="banner-meta">
+    <span class="banner-title">HIRING + ONBOARDING SYSTEM</span>
+    <span class="banner-version">v1.0 · Packaging + Fulfillment · Internal Use Only</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════════════════ -->
+<div class="nav">
+  <div class="nav-tab active"  onclick="showPane('brief',this)">System Brief</div>
+  <div class="nav-tab"         onclick="showPane('score',this)">Hiring Scorecard</div>
+  <div class="nav-tab"         onclick="showPane('interview',this)">Interview Guide</div>
+  <div class="nav-tab"         onclick="showPane('onboard',this)">Onboarding Checklist</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 1 — SYSTEM BRIEF
+════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane active" id="pane-brief">
+
+  <div class="section-label">Why This Exists</div>
+  <div class="section-title">Problem Statement</div>
+  <p class="body-text">Packaging and fulfillment is the primary throughput bottleneck — not production. Every week without a dedicated hire is a week Eric stays buried in operations instead of generating revenue. This system installs the hiring, screening, and onboarding process so Leighanna can execute independently and Eric can stay focused on sales.</p>
+
+  <div class="why-row">
+    <div class="why-col why-col-green">
+      <div class="why-col-label">What it solves</div>
+      <p>Removes fulfillment ops from Eric's plate. Creates a repeatable process for finding and onboarding reliable floor workers.</p>
+    </div>
+    <div class="why-col why-col-blue">
+      <div class="why-col-label">What it enables</div>
+      <p>Leighanna runs hiring and management independently. Standards exist before the first hire walks in the door.</p>
+    </div>
+    <div class="why-col why-col-purple">
+      <div class="why-col-label">How it scales</div>
+      <p>Each hire adds capacity without chaos. The system grows as the team grows — same process, more people.</p>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- ERIC BLOCK -->
+  <div class="stakeholder-block purple">
+    <div class="stakeholder-header">
+      <div class="avatar avatar-purple">E</div>
+      <div>
+        <div class="stakeholder-name">Eric</div>
+        <div class="stakeholder-role">Founder · Strategic Owner</div>
+      </div>
+      <div style="margin-left:auto"><span class="badge badge-purple">Executive Review</span></div>
+    </div>
+
+    <div class="section-label">Your Role in This System</div>
+    <p class="body-text" style="margin-bottom:18px">Review this once. Align with Leighanna on the six decisions below. Then step back. Your involvement in day-to-day fulfillment ops ends here.</p>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="callout callout-purple" style="margin-bottom:0">
+        <strong>Watch at 30 days</strong>
+        <span>Is Leighanna running daily floor execution without escalating to you? If you're still being pulled in, the handoff isn't complete.</span>
+      </div>
+      <div class="callout callout-amber" style="margin-bottom:0">
+        <strong>Watch at 2× volume</strong>
+        <span>One generalist hire won't hold at 2× throughput. That's when Hire 2 (verifier/QA) and a shift lead become necessary — not a nice-to-have.</span>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:20px">Infrastructure Status</div>
+    <div class="section-title">What's Built vs. What's Next</div>
+    <ul class="status-list">
+      <li class="status-item"><div class="status-dot dot-green"></div><span><strong>Hiring criteria and scorecard</strong> — defined and ready to use</span></li>
+      <li class="status-item"><div class="status-dot dot-green"></div><span><strong>Interview guide with red flags</strong> — 6-question structure with strong/weak answer guide</span></li>
+      <li class="status-item"><div class="status-dot dot-green"></div><span><strong>First-week onboarding plan</strong> — day-by-day with quality checkpoints</span></li>
+      <li class="status-item"><div class="status-dot dot-green"></div><span><strong>Management playbook for Leighanna</strong> — daily rhythm, accountability, how to handle underperformance</span></li>
+      <li class="status-item"><div class="status-dot dot-amber"></div><span><strong>One-page written SOP per task</strong> — not yet built. Needs to be written during Hire 1 ramp.</span></li>
+      <li class="status-item"><div class="status-dot dot-amber"></div><span><strong>QA checkpoint (pack → verify → ship)</strong> — not formalized. Target: end of Month 1.</span></li>
+      <li class="status-item"><div class="status-dot dot-gray"></div><span><strong>Batch/order tracking log</strong> — not yet. Spreadsheet is sufficient at this stage.</span></li>
+      <li class="status-item"><div class="status-dot dot-gray"></div><span><strong>Shift lead role</strong> — not needed yet. Triggers at 3+ floor workers.</span></li>
+    </ul>
+
+    <div class="gap-sm"></div>
+    <div class="section-label">Alignment Checklist</div>
+    <div class="section-title">Six Decisions — One Conversation With Leighanna</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:50%">Decision</th><th style="width:25%">Owner</th><th style="width:25%">Confirmed?</th></tr></thead>
+        <tbody>
+          <tr><td class="key">Hire 1 compensation range</td><td>Eric</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+          <tr><td class="key">Full-time vs. part-time vs. temp-to-perm approach</td><td>Eric + Leighanna</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+          <tr><td class="key">Leighanna has authority to make the hire decision without Eric's approval</td><td>Eric</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+          <tr><td class="key">Leighanna owns daily floor management — Eric does not override</td><td>Eric</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+          <tr><td class="key">Weekly check-in cadence (Eric + Leighanna)</td><td>Both</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+          <tr><td class="key">What "successful fulfillment" means in measurable terms</td><td>Both</td><td><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" onclick="this.parentElement.querySelector('span').textContent=this.checked?'✓ Yes':'—'"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">—</span></label></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-amber">
+      <strong>Non-negotiables in this system</strong>
+      <span>Reliability is the #1 hiring criterion and overrides all other scores. Leighanna must have real authority to hire and manage without requiring Eric's sign-off on daily decisions. Without these two things, the handoff won't hold.</span>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <!-- LEIGHANNA BLOCK -->
+  <div class="stakeholder-block teal">
+    <div class="stakeholder-header">
+      <div class="avatar avatar-teal">L</div>
+      <div>
+        <div class="stakeholder-name">Leighanna</div>
+        <div class="stakeholder-role">Operations Lead · Execution Owner</div>
+      </div>
+      <div style="margin-left:auto"><span class="badge badge-teal">Operator Guide</span></div>
+    </div>
+
+    <div class="section-label">What This System Does for You</div>
+    <p class="body-text" style="margin-bottom:14px">You don't have to figure out how to hire or what to look for — it's already built. Your job is to use these tools in sequence, trust the process, and manage with confidence once the hire is in place.</p>
+
+    <div class="callout callout-teal" style="margin-bottom:20px">
+      <strong>Your role in one sentence</strong>
+      <span>Build a small team that takes packaging and fulfillment completely off Eric — accurate orders, on time, every day, without Eric involved.</span>
+    </div>
+
+    <div class="section-label">Document Map</div>
+    <div class="section-title">What Each Tab Is and When to Use It</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:22%">Tab</th><th style="width:35%">What It Is</th><th>When to Use It</th></tr></thead>
+        <tbody>
+          <tr><td class="key">System Brief</td><td>Context, ownership, what Eric needs to confirm</td><td>Once — before sourcing begins. Use the alignment checklist with Eric.</td></tr>
+          <tr><td class="key">Hiring Scorecard</td><td>11-criterion scoring card, 1–5 per criterion</td><td>During and immediately after every in-person interview. One per candidate.</td></tr>
+          <tr><td class="key">Interview Guide</td><td>Phone screen checklist + 6 interview questions</td><td>Every interview, in order. Phone screen first, then in-person.</td></tr>
+          <tr><td class="key">Onboarding Checklist</td><td>Day-by-day Week 1 task list with quality checkpoints</td><td>From Day 1 through end of Week 1. Keep it open on your phone or printed.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-label" style="margin-top:6px">Ownership Ladder</div>
+    <div class="section-title">What Leighanna Owns — By Phase</div>
+    <div class="ladder">
+      <div class="ladder-phase">
+        <div class="ladder-header">Now — Week 1–2</div>
+        <div class="ladder-body">
+          <div class="ladder-item">Post for Hire 1</div>
+          <div class="ladder-item">Run phone screens</div>
+          <div class="ladder-item">Score in-person interviews</div>
+          <div class="ladder-item">Make hire decision</div>
+          <div class="ladder-item">Execute Day 1 onboarding</div>
+        </div>
+      </div>
+      <div class="ladder-phase">
+        <div class="ladder-header">Month 1</div>
+        <div class="ladder-body">
+          <div class="ladder-item">Own daily floor execution</div>
+          <div class="ladder-item">Write first one-page SOPs</div>
+          <div class="ladder-item">Install QA checkpoint</div>
+          <div class="ladder-item">Weekly check-in with Eric</div>
+          <div class="ladder-item">Evaluate if Hire 2 is needed</div>
+        </div>
+      </div>
+      <div class="ladder-phase">
+        <div class="ladder-header">Month 2+</div>
+        <div class="ladder-body">
+          <div class="ladder-item">Manage 2–3 person floor team</div>
+          <div class="ladder-item">Own throughput metrics</div>
+          <div class="ladder-item">Identify shift lead candidate</div>
+          <div class="ladder-item">Propose system improvements</div>
+          <div class="ladder-item">Reduce Eric visibility to zero</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gap-sm"></div>
+    <div class="callout callout-green">
+      <strong>What to not overthink</strong>
+      <span>The perfect hire doesn't exist. Hire reliable, train the rest. You don't need a perfect system before you hire — you need a working one. If someone isn't working out by Week 2, trust your gut early. It rarely gets better on its own.</span>
+    </div>
+  </div>
+
+</div><!-- /brief -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 2 — HIRING SCORECARD
+════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-score">
+
+  <div class="meta-grid">
+    <div class="meta-field"><div class="meta-label">Candidate Name</div><input class="meta-input" type="text" placeholder="Full name"></div>
+    <div class="meta-field"><div class="meta-label">Interview Date</div><input class="meta-input" type="text" placeholder="MM / DD / YYYY"></div>
+    <div class="meta-field"><div class="meta-label">Interviewed By</div><input class="meta-input" type="text" placeholder="Leighanna"></div>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>How to use this scorecard</strong>
+    <span>Score each criterion as the interview progresses. Click a numbered box to select. Add notes in the right column. Complete the total and recommendation within 30 minutes of the interview ending.</span>
+  </div>
+
+  <div class="table-wrap" style="margin-top:20px">
+    <table>
+      <thead><tr><th style="width:40%">Criterion</th><th style="width:22%">Score 1–5</th><th style="width:38%">Notes</th></tr></thead>
+      <tbody id="score-tbody">
+        <tr class="score-section-row"><td colspan="3">Reliability</td></tr>
+        <tr><td class="score-label-cell"><strong>Shows Up Consistently</strong><span>Job history, no unexplained gaps, stable tenure</span></td><td><div class="score-boxes" data-id="s1"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Transportation Confirmed</strong><span>Has a specific, reliable way to get here every shift</span></td><td><div class="score-boxes" data-id="s2"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Schedule Fit</strong><span>Available for the fixed shift without conditions</span></td><td><div class="score-boxes" data-id="s3"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr class="score-section-row"><td colspan="3">Attention to Detail</td></tr>
+        <tr><td class="score-label-cell"><strong>Catches Own Errors</strong><span>Described a time they caught a mistake before it mattered</span></td><td><div class="score-boxes" data-id="s4"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Asks, Doesn't Guess</strong><span>Questions when unclear rather than assuming and proceeding</span></td><td><div class="score-boxes" data-id="s5"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Follows Process</strong><span>Comfortable with structured, repetitive, step-based work</span></td><td><div class="score-boxes" data-id="s6"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr class="score-section-row"><td colspan="3">Pace + Work Ethic</td></tr>
+        <tr><td class="score-label-cell"><strong>Steady Under Pressure</strong><span>Describes a method — not just "I work harder"</span></td><td><div class="score-boxes" data-id="s7"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Doesn't Cut Corners</strong><span>Maintains accuracy when volume increases</span></td><td><div class="score-boxes" data-id="s8"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr class="score-section-row"><td colspan="3">Attitude</td></tr>
+        <tr><td class="score-label-cell"><strong>Accountability</strong><span>Owns mistakes, doesn't deflect or blame others</span></td><td><div class="score-boxes" data-id="s9"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>No Drama</strong><span>Stable, calm, not reactive during conversation</span></td><td><div class="score-boxes" data-id="s10"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+        <tr><td class="score-label-cell"><strong>Wants to Do It Right</strong><span>Intrinsically motivated by quality, not just task completion</span></td><td><div class="score-boxes" data-id="s11"></div></td><td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="total-bar">
+    <div class="total-card">
+      <div class="total-label">Total Score</div>
+      <div><span class="total-score" id="live-score">0</span><span class="total-denom"> / 55</span></div>
+      <div class="total-scale">45–55 Strong hire &nbsp;·&nbsp; 30–44 Consider &nbsp;·&nbsp; &lt;30 Pass</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Recommendation</div>
+      <div class="rec-buttons">
+        <button class="rec-btn" onclick="selectRec(this,'sel-hire')">Hire</button>
+        <button class="rec-btn" onclick="selectRec(this,'sel-second')">Second Interview</button>
+        <button class="rec-btn" onclick="selectRec(this,'sel-pass')">Pass</button>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:#8a8a85;font-style:italic">Gut check: Would you want this person beside you on a hard day?</div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="section-label">Instant Disqualifiers</div>
+  <div class="section-title">Any One of These = End the Conversation</div>
+  <div class="card">
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">2+ jobs in the last 12 months with no explanation</strong><br><span style="font-size:12px;color:#8a8a85">Short tenure without a clear reason is a pattern, not a circumstance.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">Can't start within 1 week</strong><br><span style="font-size:12px;color:#8a8a85">The bottleneck is active. For Hire 1, timing is part of the requirement.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">Transportation is uncertain or conditional</strong><br><span style="font-size:12px;color:#8a8a85">If they can't confirm how they're getting here, reliability is already in question.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">Needs flexible scheduling when the role is fixed-shift</strong><br><span style="font-size:12px;color:#8a8a85">The operation runs on a schedule. This isn't a negotiable.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">Asks about PTO or benefits before asking about the role</strong><br><span style="font-size:12px;color:#8a8a85">Signals misaligned priorities at this stage.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><strong style="font-size:13px">Excessive phone use during the interview</strong><br><span style="font-size:12px;color:#8a8a85">Floor work requires presence. This is a preview of on-shift behavior.</span></div></div>
+  </div>
+
+  <div class="callout callout-purple">
+    <strong>A low Reliability score overrides everything else.</strong>
+    <span>A 50/55 total with a 1 on "Shows Up Consistently" is not a hire. Reliability is the non-negotiable floor. All other skills are trainable.</span>
+  </div>
+
+</div><!-- /score -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 3 — INTERVIEW GUIDE
+════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-interview">
+
+  <div class="section-label">Before You Meet</div>
+  <div class="section-title">Phone Screen — Do This First</div>
+  <div class="callout callout-amber">
+    <strong>All four must pass before scheduling an in-person interview.</strong>
+    <span>This takes 5–7 minutes. You're filtering for real availability and basic fit — not character.</span>
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Fewer than 2 jobs in the last 12 months — or gaps are clearly explained</strong><span>Ask: "Can you walk me through your last year or two of work?" Listen for honesty and continuity.</span></div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Can start within 1 week</strong><span>Ask: "If this is a fit, how soon could you start?" Don't move forward if the answer isn't within 7 days.</span></div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Fixed-shift availability confirmed — no conditions</strong><span>State the exact schedule. Ask if anything would prevent them from being there consistently.</span></div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Transportation is specific and reliable</strong><span>Ask: "How would you be getting here each day?" Vague answers are a real risk.</span></div></div>
+  </div>
+
+  <div class="section-label">In-Person Interview</div>
+  <div class="section-title">6 Questions — Ask Every One, In Order</div>
+  <p class="body-text">Left = strong answer. Right = red flag. Use the notes field on the scorecard tab to capture specifics as you go.</p>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q1</span><span class="q-text">Walk me through a typical day at your last job.</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Specific. Sequential. Describes what "done" looks like. Shows comfort with structured repetitive work without complaining about it.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Vague. Jumps around. Complains about management unprompted. Can't describe a normal day in concrete terms.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q2</span><span class="q-text">Tell me about a time you caught a mistake before it became a problem.</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Specific example. Took ownership. Fixed it or flagged it immediately. Doesn't need follow-up prompting to get the details.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Can't think of one. Blames someone else. Describes a case where they let it go or hid it from their manager.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q3</span><span class="q-text">How do you handle it when the pace picks up and things get busy?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Describes a method or personal system. Stays calm in the description. Explicitly says they don't skip steps under pressure.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>"I just work harder." No specifics. Or visibly flustered just describing a busy scenario — that's a preview of on-floor behavior.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q4</span><span class="q-text">If you realized mid-shift you'd been doing something the wrong way, what would you do?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Stops immediately. Flags it. Asks for correction. Doesn't try to self-fix silently or finish the task first and mention it later.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Finishes the task anyway. Hides it. "I'd just keep going and mention it later." These are the errors that compound at volume.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q5</span><span class="q-text">What's the longest you've held a job, and why did you leave?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>1+ year. Left voluntarily for a growth, pay, or personal reason. Talks about it plainly without over-explaining or hedging.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Fired. Multiple short stints. Vague or evasive about the reason. Gets defensive when you ask a natural follow-up question.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q6</span><span class="q-text">Is there anything that would prevent you from being here reliably Monday through [day]?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Clear and direct. No hesitation. Confirms availability without conditions or "it depends on…" qualifiers.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Hesitation. "It depends." Conditions or caveats. A vague "I'll figure it out" — reliability issues surface here first.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="section-label">Close</div>
+  <div class="section-title">Wrap-Up — Ask Every Time</div>
+
+  <div class="card">
+    <div style="margin-bottom:16px">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">"Do you have any questions for me about the role or how we work?"</div>
+      <p style="font-size:13px;color:#8a8a85">Curious candidates ask something. What they ask reveals what they're actually thinking about.</p>
+      <label class="field-label">Their Questions</label>
+      <textarea class="textarea-field" rows="2" placeholder="What they asked…"></textarea>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">"What would make this a great fit for you?"</div>
+      <p style="font-size:13px;color:#8a8a85">Reveals alignment. Red flag if they list things you can't deliver. Green flag if they describe what the role actually offers.</p>
+      <label class="field-label">Their Answer</label>
+      <textarea class="textarea-field" rows="2" placeholder="Their answer…"></textarea>
+    </div>
+    <div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">"When can you start?"</div>
+      <p style="font-size:13px;color:#8a8a85">Direct availability test. Hesitation here after they already confirmed availability on the phone = inconsistency worth noting.</p>
+      <label class="field-label">Date They Gave</label>
+      <textarea class="textarea-field" rows="1" placeholder="Start date…"></textarea>
+    </div>
+  </div>
+
+  <div class="callout callout-teal">
+    <strong>Make the hire decision the same day.</strong>
+    <span>Tell them when they'll hear back — give a specific day, not "we'll be in touch." Delaying doesn't improve the decision. It costs you good candidates to faster employers.</span>
+  </div>
+
+</div><!-- /interview -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 4 — ONBOARDING CHECKLIST
+════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-onboard">
+
+  <div class="meta-grid">
+    <div class="meta-field"><div class="meta-label">Hire Name</div><input class="meta-input" type="text" placeholder="Full name"></div>
+    <div class="meta-field"><div class="meta-label">Start Date</div><input class="meta-input" type="text" placeholder="MM / DD / YYYY"></div>
+    <div class="meta-field"><div class="meta-label">Managed By</div><input class="meta-input" type="text" placeholder="Leighanna"></div>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>Rule: Accuracy and reliability first. Pace comes second.</strong>
+    <span>Don't push for full volume in Week 1. Slow and accurate is the right outcome. Pace builds. Reliability is fixed.</span>
+  </div>
+
+  <div class="progress-label" id="ob-progress-label">0 of 20 complete</div>
+  <div class="progress-wrap"><div class="progress-fill" id="ob-progress-fill"></div></div>
+
+  <!-- DAY 1 -->
+  <div class="phase-header"><div class="phase-header-title">Day 1 — Orient & Observe</div><div class="phase-header-sub">Goal: They understand the full flow before touching anything alone</div></div>
+  <div class="phase-body">
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Tour the facility — production, packaging, staging, supplies</strong><span>Show where everything lives and explain the sequence before any tasks begin.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Walk the full order → pack → label → ship flow with them</strong><span>Do it physically with a real order. Don't just describe it.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Work beside them for the first 2–3 hours on live tasks</strong><span>This is calibration, not hand-holding. You're setting the standard in real time.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Show them one completed "good" packed order — explicitly</strong><span>Say it out loud: "This is what a correct order looks like." Make the standard tangible.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Cover facility basics — safety, equipment, supplies, escalation</strong><span>Emergency exits, what they'll operate, where supplies are, who to ask if you're unavailable.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>End-of-day conversation: "What was confusing?"</strong><span>What they ask tells you more than observing them. A good hire asks specific questions.</span></div></div>
+  </div>
+
+  <!-- DAYS 2–3 -->
+  <div class="phase-header"><div class="phase-header-title">Days 2–3 — Independent With Check-Ins</div><div class="phase-header-sub">Goal: They work alone. You verify quality is holding.</div></div>
+  <div class="phase-body">
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Assign task set before the shift starts — quantity, task, deadline</strong><span>Written is better than verbal. Ambiguity about the target creates drift.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Check in at 60–90 minute intervals — not constantly</strong><span>Set checkpoints. Don't hover. Hovering signals distrust and creates dependence.</span><div class="gate gate-amber">Do not check in more frequently than every 60 minutes</div></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Spot-check 10–15% of completed work — unannounced</strong><span>Check: label accuracy, quantity, packaging condition. Random, not announced.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Correct any errors same day, in person</strong><span>Show the right way together. Don't just note it — that's too late at this stage.</span><div class="gate gate-amber">Same-day correction is non-negotiable in Week 1</div></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Note: are they asking questions or guessing silently?</strong><span>Asking = green flag. Silent guessing = address immediately. This pattern sets in fast.</span></div></div>
+  </div>
+
+  <!-- DAYS 4–5 -->
+  <div class="phase-header"><div class="phase-header-title">Days 4–5 — Full Load + Measure</div><div class="phase-header-sub">Goal: Establish baseline throughput and quality rate</div></div>
+  <div class="phase-body">
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Assign full day's volume with a specific target</strong><span>e.g., "40 orders packed and staged by 2pm." Measurable and time-bound.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Track actual vs. target — informally</strong><span>Don't penalize shortfall on Day 4. Use it to calibrate real capacity and identify setup issues.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Spot-check quality — same rigor as Days 2–3</strong><span>Don't reduce quality checks because pace is increasing. Quality monitoring is permanent.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Identify what's slowing them down — process or person?</strong><span>Unclear setup, missing tools, or workspace layout issues are fixable. Attitude isn't.</span></div></div>
+  </div>
+
+  <!-- END OF WEEK -->
+  <div class="phase-header"><div class="phase-header-title">End of Week 1 — Review Conversation</div><div class="phase-header-sub">10 minutes. Informal. Covers both directions.</div></div>
+  <div class="phase-body">
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Ask: "How's it going? What's still unclear?"</strong><span>Start with their experience before sharing yours. You'll get more useful information.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Share what you've noticed — one thing well, one to improve</strong><span>Specific and direct. No fluff. Name the behavior, not a judgment about the person.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Confirm: do they understand the quality standard?</strong><span>If not, reset it clearly now. Don't let ambiguity carry into Week 2.</span></div></div>
+    <div class="check-item" onclick="toggleOb(this)"><div class="check-box"></div><div class="check-label"><strong>Make the keep/act judgment call — see verdict section below</strong><span>Make this call before the Week 2 schedule is set.</span><div class="gate gate-green">Complete before scheduling Week 2</div></div></div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="gap"></div>
+  <div class="section-label">Week 1 Assessment</div>
+  <div class="section-title">Keep or Act?</div>
+
+  <div class="verdict-grid">
+    <div class="verdict-card verdict-green">
+      <div class="verdict-title">✓ Keep — Green Flags</div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Shows up on time every day without follow-up</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Knows the workflow without prompting by Day 5</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Error rate is low — even if pace is still building</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Asks before guessing. Takes correction without defensiveness.</span></div>
+    </div>
+    <div class="verdict-card verdict-red">
+      <div class="verdict-title">✕ Act Now — Red Flags</div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Late or absent more than once in Week 1</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Guesses repeatedly after being corrected</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Quality errors persist after being shown the right way</span></div>
+      <div class="verdict-item"><div class="v-dot"></div><span>Defensive to feedback. Disengages visibly by Day 3–4.</span></div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <strong>If you're seeing red flags by Day 3, don't wait until Friday.</strong>
+    <span>Address it directly the same day. Correction at Day 3 is easy. Correction at Week 3 is a habit fight.</span>
+  </div>
+
+  <div class="card">
+    <div class="grid-2" style="margin-bottom:14px">
+      <div><label class="field-label">Hire Name</label><input style="width:100%;border:none;border-bottom:1px solid #e2e1dc;padding:4px 0;font-family:'Inter',sans-serif;font-size:13px;background:transparent;outline:none" type="text"></div>
+      <div><label class="field-label">End of Week Date</label><input style="width:100%;border:none;border-bottom:1px solid #e2e1dc;padding:4px 0;font-family:'Inter',sans-serif;font-size:13px;background:transparent;outline:none" type="text"></div>
+    </div>
+    <label class="field-label">What went well</label>
+    <textarea class="textarea-field" rows="2" placeholder="Specific observations…"></textarea>
+    <label class="field-label">What needs improvement</label>
+    <textarea class="textarea-field" rows="2" placeholder="Specific, concrete examples…"></textarea>
+    <label class="field-label">Decision</label>
+    <div class="verdict-btns" style="margin-top:8px">
+      <button class="v-btn" onclick="selectVerdictBtn(this,'#eaf5f0','#1a6e42','#a8dcc0')">Continue — Week 2</button>
+      <button class="v-btn" onclick="selectVerdictBtn(this,'#fdf5e6','#7a4d08','#f0d080')">Performance Conversation</button>
+      <button class="v-btn" onclick="selectVerdictBtn(this,'#fdf0f0','#8a1f1f','#f0aaaa')">End Engagement</button>
+    </div>
+  </div>
+
+  <!-- ONGOING RHYTHM -->
+  <div class="gap"></div>
+  <div class="section-label">After Week 1</div>
+  <div class="section-title">Ongoing Management Rhythm</div>
+
+  <div class="rhythm-grid">
+    <div class="rhythm-card">
+      <div class="rhythm-label">Daily</div>
+      <div class="rhythm-item">Before shift: state task, quantity target, deadline</div>
+      <div class="rhythm-item">Midday checkpoint — on track?</div>
+      <div class="rhythm-item">Random quality spot-check (10–15% of output)</div>
+      <div class="rhythm-item">End of shift: blockers or issues to log?</div>
+    </div>
+    <div class="rhythm-card">
+      <div class="rhythm-label">Weekly</div>
+      <div class="rhythm-item">Short feedback conversation (5–10 min)</div>
+      <div class="rhythm-item">Name one thing they did well — specifically</div>
+      <div class="rhythm-item">Name one thing to improve — specifically</div>
+      <div class="rhythm-item">Communicate any process or standard changes</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Situation</th><th style="width:30%">Likely Cause</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr><td class="key">Moving too slow</td><td>Slow + confused</td><td>Training problem. Re-show the process. Be specific about what's unclear.</td></tr>
+        <tr><td class="key">Moving too slow</td><td>Knows the process, still slow</td><td>Performance conversation. Set a target. Give a timeline. Be direct.</td></tr>
+        <tr><td class="key">Sloppy work</td><td>Rushing or standard wasn't clear</td><td>Stop the work together. Correct the error. Reset the standard explicitly.</td></tr>
+        <tr><td class="key">Attendance issues</td><td>One-off vs. pattern</td><td>One instance: note it. Three instances: decision point. Document all of them.</td></tr>
+        <tr><td class="key">Defensive to feedback</td><td>Style or real resistance</td><td>Separate observation from judgment. "I noticed X" — not "you always do Y."</td></tr>
+        <tr><td class="key">Over-reliance on you</td><td>Independence not built in ramp</td><td>Step back intentionally. Respond with questions: "What do you think?"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-green">
+    <strong>Your job as the leader: make it easy for them to do good work.</strong>
+    <span>Clear instructions. Clear space. Clear standards. Remove obstacles. That's it.</span>
+  </div>
+
+</div><!-- /onboard -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <span>Hritsko Hiring + Onboarding System · v1.0 · Internal Use Only</span>
+  <span id="footer-date"></span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════ -->
+<script>
+  // Logo
+  document.getElementById('logo').src = 'data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==';
+
+  // Tab navigation
+  function showPane(id, el) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('pane-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  // Scorecard — build score boxes
+  function buildScoreBoxes() {
+    document.querySelectorAll('.score-boxes').forEach(container => {
+      for (let i = 1; i <= 5; i++) {
+        const box = document.createElement('div');
+        box.className = 'score-box';
+        box.textContent = i;
+        box.dataset.val = i;
+        box.addEventListener('click', function () {
+          container.querySelectorAll('.score-box').forEach(b => b.classList.remove('selected'));
+          this.classList.add('selected');
+          updateTotal();
+        });
+        container.appendChild(box);
+      }
+    });
+  }
+
+  function updateTotal() {
+    let total = 0;
+    document.querySelectorAll('#pane-score .score-box.selected').forEach(b => { total += parseInt(b.dataset.val); });
+    const el = document.getElementById('live-score');
+    el.textContent = total;
+    if (total >= 45)      el.style.color = '#1a6e42';
+    else if (total >= 30) el.style.color = '#7a4d08';
+    else if (total > 0)   el.style.color = '#8a1f1f';
+    else                  el.style.color = '#0c0c0c';
+  }
+
+  function selectRec(btn, cls) {
+    document.querySelectorAll('.rec-btn').forEach(b => b.className = 'rec-btn');
+    btn.classList.add(cls);
+  }
+
+  // Interview checklist toggle
+  function toggleCheck(item) {
+    item.querySelector('.check-box').classList.toggle('checked');
+  }
+
+  // Onboarding checklist toggle + progress
+  function toggleOb(item) {
+    item.querySelector('.check-box').classList.toggle('checked');
+    item.classList.toggle('done');
+    updateObProgress();
+  }
+
+  function updateObProgress() {
+    const total = document.querySelectorAll('#pane-onboard .check-item').length;
+    const done  = document.querySelectorAll('#pane-onboard .check-box.checked').length;
+    document.getElementById('ob-progress-label').textContent = done + ' of ' + total + ' complete';
+    document.getElementById('ob-progress-fill').style.width = (done / total * 100) + '%';
+  }
+
+  function selectVerdictBtn(btn, bg, color, border) {
+    btn.closest('.verdict-btns').querySelectorAll('.v-btn').forEach(b => { b.style.background = '#fff'; b.style.color = '#4a4948'; b.style.borderColor = '#e2e1dc'; });
+    btn.style.background = bg; btn.style.color = color; btn.style.borderColor = border;
+  }
+
+  // Footer date
+  document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  buildScoreBoxes();
+</script>
+</body>
+</html>
