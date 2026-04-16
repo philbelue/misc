@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding Checklist — Hritsko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; background: #f5f4f0; color: #1a1a1a; padding-bottom: 80px; }
+  .banner { background: #0c0c0c; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; }
+  .banner img { height: 28px; }
+  .banner-meta { text-align: right; }
+  .banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .08em; }
+  .banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; display: block; }
+  .nav { background: #fff; border-bottom: 1px solid #e2e1dc; position: sticky; top: 64px; z-index: 99; display: flex; padding: 0 28px; }
+  .nav-tab { font-size: 13px; font-weight: 500; color: #8a8a85; padding: 14px 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+  .nav-tab:hover { color: #1a1a1a; }
+  .nav-tab.active { color: #1a1a1a; border-bottom-color: #0c0c0c; }
+  .tab-content { display: none; max-width: 900px; margin: 0 auto; padding: 36px 28px; }
+  .tab-content.active { display: block; }
+  .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #b8b7b2; margin-bottom: 6px; }
+  .section-title { font-size: 16px; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #e2e1dc; margin-bottom: 20px; }
+  .card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 14px; }
+  .callout-green { border-color: #25a05e; background: #eaf5f0; color: #1a6e42; }
+  .callout-blue { border-color: #2e6cc4; background: #eaf0f9; color: #1a4f8a; }
+  .callout-amber { border-color: #c8880e; background: #fdf5e6; color: #7a4d08; }
+  .callout-red { border-color: #cc3333; background: #fdf0f0; color: #8a1f1f; }
+  .callout-purple { border-color: #6e48c0; background: #f2eefb; color: #4a2880; }
+  .callout-teal { border-color: #1a9090; background: #e8f6f6; color: #0d5c5c; }
+  .callout strong { display: block; margin-bottom: 3px; }
+  .table-wrap { border: 1px solid #e2e1dc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { background: #0c0c0c; }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); padding: 11px 14px; text-align: left; letter-spacing: .06em; text-transform: uppercase; font-weight: 400; }
+  tbody tr { border-bottom: 1px solid #e2e1dc; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f5f4f0; }
+  tbody td { padding: 12px 14px; font-size: 13px; color: #4a4948; vertical-align: top; }
+  td.key { font-weight: 500; color: #1a1a1a; }
+
+  /* META */
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .meta-field { background: #fff; border: 1px solid #e2e1dc; border-radius: 8px; padding: 12px 14px; }
+  .meta-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .meta-input { width: 100%; border: none; border-bottom: 1px solid #e2e1dc; padding: 4px 0; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #1a1a1a; background: transparent; outline: none; }
+  .meta-input:focus { border-bottom-color: #0c0c0c; }
+
+  /* DAY BLOCKS */
+  .day-block { margin-bottom: 28px; }
+  .day-header { border-radius: 8px 8px 0 0; padding: 13px 18px; background: #0c0c0c; }
+  .day-header-title { font-weight: 600; font-size: 14px; color: #fff; }
+  .day-header-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 3px; letter-spacing: .06em; }
+  .day-body { background: #fff; border: 1px solid #e2e1dc; border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .check-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 18px; border-bottom: 1px solid #f0efea; cursor: pointer; transition: background 0.1s; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #fafaf8; }
+  .check-box { width: 18px; height: 18px; border: 1.5px solid #d0cfca; border-radius: 4px; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .check-box.checked { background: #0c0c0c; border-color: #0c0c0c; }
+  .check-box.checked::after { content: '✓'; color: #fff; font-size: 11px; }
+  .check-label { flex: 1; }
+  .check-label strong { display: block; font-size: 13px; font-weight: 500; color: #1a1a1a; }
+  .check-label span { font-size: 12px; color: #8a8a85; display: block; margin-top: 2px; }
+  .check-item.completed .check-label strong { color: #8a8a85; text-decoration: line-through; }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap { background: #f0efea; border-radius: 4px; height: 6px; margin-bottom: 24px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #0c0c0c; border-radius: 4px; transition: width 0.3s; width: 0%; }
+  .progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8a8a85; margin-bottom: 6px; }
+
+  /* TWO COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .verdict-card { border-radius: 10px; padding: 18px 20px; }
+  .verdict-green { background: #eaf5f0; border: 1px solid #a8dcc0; }
+  .verdict-red { background: #fdf0f0; border: 1px solid #f0aaaa; }
+  .verdict-title { font-weight: 600; font-size: 13px; margin-bottom: 12px; }
+  .verdict-green .verdict-title { color: #1a6e42; }
+  .verdict-red .verdict-title { color: #8a1f1f; }
+  .verdict-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+  .verdict-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+  .verdict-green .verdict-dot { background: #25a05e; }
+  .verdict-red .verdict-dot { background: #cc3333; }
+  .verdict-green .verdict-item { color: #1a6e42; }
+  .verdict-red .verdict-item { color: #8a1f1f; }
+
+  /* ONGOING */
+  .rhythm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .rhythm-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 16px 18px; }
+  .rhythm-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+  .rhythm-item { font-size: 13px; color: #4a4948; padding: 5px 0; border-bottom: 1px solid #f5f4f0; }
+  .rhythm-item:last-child { border-bottom: none; }
+
+  .footer { background: #0c0c0c; position: fixed; bottom: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+  .footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.25); }
+  @media print { .nav, .footer { display: none; } .banner { position: relative; } .tab-content { display: block !important; padding-top: 16px; } body { padding-bottom: 0; } }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <img src="data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-meta">
+    <span class="banner-title">FIRST-WEEK ONBOARDING CHECKLIST</span>
+    <span class="banner-version">v1.0 · Internal Use Only</span>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('checklist', this)">Week 1 Checklist</div>
+  <div class="nav-tab" onclick="showTab('verdict', this)">End-of-Week Verdict</div>
+  <div class="nav-tab" onclick="showTab('ongoing', this)">Ongoing Rhythm</div>
+</div>
+
+<!-- CHECKLIST TAB -->
+<div class="tab-content active" id="tab-checklist">
+
+  <div class="meta-grid">
+    <div class="meta-field"><div class="meta-label">Hire Name</div><input class="meta-input" type="text" placeholder="Full name"></div>
+    <div class="meta-field"><div class="meta-label">Start Date</div><input class="meta-input" type="text" placeholder="MM / DD / YYYY"></div>
+    <div class="meta-field"><div class="meta-label">Managed By</div><input class="meta-input" type="text" placeholder="Leighanna"></div>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>Rule: Accuracy and reliability first. Pace comes second.</strong>
+    Don't push for full volume in the first week. A slow, accurate week 1 is far better than a fast, error-filled one.
+  </div>
+
+  <div class="progress-label" id="progress-label">0 of 20 complete</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+
+  <!-- DAY 1 -->
+  <div class="day-block">
+    <div class="day-header">
+      <div class="day-header-title">Day 1 — Orient & Observe</div>
+      <div class="day-header-sub">Goal: They understand the full flow before touching anything alone</div>
+    </div>
+    <div class="day-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Tour the facility</strong><span>Production → packaging area → shipping staging → supplies. Show where everything lives. Explain the sequence.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Walk the full order → pack → label → ship flow</strong><span>Do it with them. Don't just describe it — physically walk through a real order.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Work beside them for first 2–3 hours on live tasks</strong><span>This is calibration, not hand-holding. You're setting the standard in real time.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Show them one completed "good" packed order</strong><span>This is the quality reference. Say it explicitly: "This is what a correct order looks like."</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Cover safety and facility basics</strong><span>Emergency exits, equipment they'll touch, where to find supplies, who to ask if you're not available.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>End-of-day conversation: "What was confusing?"</strong><span>What they ask tells you more than observing them. A good hire asks specific questions.</span></div></div>
+    </div>
+  </div>
+
+  <!-- DAYS 2-3 -->
+  <div class="day-block">
+    <div class="day-header">
+      <div class="day-header-title">Days 2–3 — Independent With Check-Ins</div>
+      <div class="day-header-sub">Goal: They work alone. You verify quality is holding.</div>
+    </div>
+    <div class="day-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Assign full task set before shift starts</strong><span>Quantity target, task, and deadline stated clearly before they begin. Written is better than verbal.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Check in at 60–90 minute intervals — not constantly</strong><span>Set checkpoints. Don't hover. Hovering signals distrust and creates dependence.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Spot-check 10–15% of completed work — unannounced</strong><span>Check for: label accuracy, quantity, packaging condition. Random, not announced.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Correct any errors same day, in person</strong><span>Show the right way together. Don't just note it for later — later is too late at this stage.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Watch for: asks questions vs. guesses</strong><span>Asking = green flag. Silent guessing = address immediately. This pattern sets in fast.</span></div></div>
+    </div>
+  </div>
+
+  <!-- DAYS 4-5 -->
+  <div class="day-block">
+    <div class="day-header">
+      <div class="day-header-title">Days 4–5 — Full Load + Measure</div>
+      <div class="day-header-sub">Goal: Establish baseline throughput and quality rate</div>
+    </div>
+    <div class="day-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Assign full day's volume with a target</strong><span>Example: "40 orders packed and staged by 2pm." Make it specific and measurable.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Track actual vs. target — informally</strong><span>Don't penalize shortfall on Day 4. Use it to calibrate real capacity and identify bottlenecks in the setup, not the person.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Spot-check quality — same rigor as Days 2–3</strong><span>Don't reduce quality checks just because pace is increasing. Quality monitoring is permanent.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Note patterns: what's slowing them down?</strong><span>Process confusion? Physical setup? Missing tools? Identify the cause before labeling it a performance issue.</span></div></div>
+    </div>
+  </div>
+
+  <!-- END OF WEEK -->
+  <div class="day-block">
+    <div class="day-header">
+      <div class="day-header-title">End of Week 1 — Review Conversation</div>
+      <div class="day-header-sub">10 minutes. Informal. Covers both directions.</div>
+    </div>
+    <div class="day-body">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Ask: "How's it going? What's still unclear?"</strong><span>Start with their experience before sharing yours. You'll get more useful information.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Share what you've noticed — specific and direct</strong><span>Name one thing they're doing well. Name one thing to improve. No fluff, no sandwiching.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Confirm: do they understand the quality standard?</strong><span>If not, reset it clearly now. Don't let ambiguity about standards carry into Week 2.</span></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Make your keep/act judgment call</strong><span>See the End-of-Week Verdict tab. Make the call before the week 2 schedule is set.</span></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- VERDICT TAB -->
+<div class="tab-content" id="tab-verdict">
+
+  <div class="section-label">Week 1 Assessment</div>
+  <div class="section-title">Keep or Act?</div>
+  <p style="font-size:13px;color:#4a4948;margin-bottom:20px;">Make this call at the end of Week 1 — before the week 2 schedule is set. Waiting doesn't improve the decision.</p>
+
+  <div class="two-col">
+    <div class="verdict-card verdict-green">
+      <div class="verdict-title">✓ Keep — Green Flags</div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Shows up on time every day without follow-up</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Knows the workflow without being prompted by Day 5</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Error rate is low — even if pace is still building</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Asks questions before guessing</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Takes correction without becoming defensive</span></div>
+    </div>
+    <div class="verdict-card verdict-red">
+      <div class="verdict-title">✕ Act Now — Red Flags</div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Late or absent more than once in Week 1</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Guesses instead of asking — repeatedly, after correction</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Quality errors persist after being shown the right way</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Attitude issues or defensiveness to direct feedback</span></div>
+      <div class="verdict-item"><div class="verdict-dot"></div><span>Starts strong, visibly disengages by Day 3–4</span></div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber" style="margin-top:8px">
+    <strong>If you're seeing red flags by Day 3, don't wait until Friday.</strong>
+    Address it directly the same day. Correction at Day 3 is easy. Correction at Week 3 is a habit fight.
+  </div>
+
+  <div class="callout callout-purple">
+    <strong>Trust your gut — but make sure it's not about pace.</strong>
+    A slow but accurate, reliable hire in Week 1 is a better outcome than a fast, sloppy one. Pace builds. Reliability is fixed.
+  </div>
+
+  <div class="section-label" style="margin-top:28px">Verdict</div>
+  <div class="section-title">Week 1 Assessment Notes</div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Hire Name</div>
+        <input style="width:100%;border:none;border-bottom:1px solid #e2e1dc;padding:4px 0;font-family:'Inter',sans-serif;font-size:13px;background:transparent;outline:none" type="text" placeholder="">
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">End of Week Date</div>
+        <input style="width:100%;border:none;border-bottom:1px solid #e2e1dc;padding:4px 0;font-family:'Inter',sans-serif;font-size:13px;background:transparent;outline:none" type="text" placeholder="">
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">What went well</div>
+      <textarea style="width:100%;border:1px solid #e2e1dc;border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;background:#fafaf8;outline:none;resize:none" rows="3" placeholder="Specific observations…"></textarea>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">What needs improvement</div>
+      <textarea style="width:100%;border:1px solid #e2e1dc;border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;background:#fafaf8;outline:none;resize:none" rows="3" placeholder="Specific, concrete examples…"></textarea>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Decision</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="selectVerdict(this,'#eaf5f0','#1a6e42','#a8dcc0')" style="padding:9px 20px;border:1px solid #e2e1dc;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:#4a4948;transition:all .15s">Continue — Week 2</button>
+        <button onclick="selectVerdict(this,'#fdf5e6','#7a4d08','#f0d080')" style="padding:9px 20px;border:1px solid #e2e1dc;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:#4a4948;transition:all .15s">Performance Conversation</button>
+        <button onclick="selectVerdict(this,'#fdf0f0','#8a1f1f','#f0aaaa')" style="padding:9px 20px;border:1px solid #e2e1dc;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:#4a4948;transition:all .15s">End Engagement</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ONGOING TAB -->
+<div class="tab-content" id="tab-ongoing">
+
+  <div class="section-label">After Week 1</div>
+  <div class="section-title">Ongoing Management Rhythm</div>
+  <p style="font-size:13px;color:#4a4948;margin-bottom:20px;">Once someone is past the ramp period, these become the recurring structure. Consistency is the system.</p>
+
+  <div class="rhythm-grid">
+    <div class="rhythm-card">
+      <div class="rhythm-label">Daily</div>
+      <div class="rhythm-item">Before shift: state task, quantity, deadline</div>
+      <div class="rhythm-item">Midday checkpoint — on track?</div>
+      <div class="rhythm-item">Random quality spot-check (10–15% of output)</div>
+      <div class="rhythm-item">End of shift: any blockers to note?</div>
+    </div>
+    <div class="rhythm-card">
+      <div class="rhythm-label">Weekly</div>
+      <div class="rhythm-item">One short feedback conversation (5–10 min)</div>
+      <div class="rhythm-item">What's working → name it specifically</div>
+      <div class="rhythm-item">One thing to improve → name it specifically</div>
+      <div class="rhythm-item">Any process changes to communicate</div>
+    </div>
+  </div>
+
+  <div class="callout callout-teal" style="margin-top:8px">
+    <strong>Consistency is the management system.</strong>
+    Same standards, same check-in rhythm, every day. Inconsistency creates confusion about what's expected — and that's where quality problems start.
+  </div>
+
+  <div class="section-label" style="margin-top:28px">Management Principles</div>
+  <div class="section-title">How to Handle Common Situations</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Situation</th><th style="width:30%">Likely Cause</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr><td class="key">Moving too slow</td><td>Slow + confused</td><td>Training problem. Re-show the process. Be specific about what's unclear.</td></tr>
+        <tr><td class="key">Moving too slow</td><td>Slow + knows the process</td><td>Performance conversation. Set a target. Give a timeline. Be direct.</td></tr>
+        <tr><td class="key">Sloppy work</td><td>Rushing or unclear standard</td><td>Stop the work together. Correct the error. Reset the standard explicitly.</td></tr>
+        <tr><td class="key">Attendance issues</td><td>One-off vs. pattern</td><td>One instance: note it. Three instances: decision point. Document immediately.</td></tr>
+        <tr><td class="key">Defensive to feedback</td><td>Feedback style or actual resistance</td><td>Separate observation from judgment: "I noticed X" not "you always do Y."</td></tr>
+        <tr><td class="key">Over-reliance on you</td><td>Didn't build independence in ramp</td><td>Step back intentionally. Answer with questions: "What do you think you should do?"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-green" style="margin-top:8px">
+    <strong>Your job as the leader: make it easy for them to do good work.</strong>
+    Clear instructions. Clear space. Clear standards. Remove obstacles. That's it.
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>Hritsko Onboarding Checklist · v1.0 · Internal Use Only</span>
+  <span id="footer-date"></span>
+</div>
+
+<script>
+  document.querySelector('.banner img').src = 'data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==';
+  function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+  function toggleCheck(item) {
+    const box = item.querySelector('.check-box');
+    box.classList.toggle('checked');
+    item.classList.toggle('completed');
+    updateProgress();
+  }
+  function updateProgress() {
+    const total = document.querySelectorAll('#tab-checklist .check-item').length;
+    const done = document.querySelectorAll('#tab-checklist .check-box.checked').length;
+    document.getElementById('progress-label').textContent = done + ' of ' + total + ' complete';
+    document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
+  }
+  function selectVerdict(btn, bg, color, border) {
+    btn.parentElement.querySelectorAll('button').forEach(b => { b.style.background='#fff'; b.style.color='#4a4948'; b.style.borderColor='#e2e1dc'; });
+    btn.style.background = bg; btn.style.color = color; btn.style.borderColor = border;
+  }
+  document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+</script>
+</body>
+</html>
