@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hritsko — Operations Control Tower v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0c0c0c;
+    --page-bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e1dc;
+    --text: #1a1a1a;
+    --text-2: #4a4948;
+    --text-3: #8a8a85;
+    --text-hint: #b8b7b2;
+    --green-text: #1a6e42; --green-bg: #eaf5f0; --green-border: #a8dcc0; --green-dot: #25a05e;
+    --blue-text: #1a4f8a; --blue-bg: #eaf0f9; --blue-border: #a8c4e8; --blue-dot: #2e6cc4;
+    --amber-text: #7a4d08; --amber-bg: #fdf5e6; --amber-border: #f0d080; --amber-dot: #c8880e;
+    --red-text: #8a1f1f; --red-bg: #fdf0f0; --red-border: #f0aaaa; --red-dot: #cc3333;
+    --purple-text: #4a2880; --purple-bg: #f2eefb; --purple-border: #c4aeed; --purple-dot: #6e48c0;
+    --teal-text: #0d5c5c; --teal-bg: #e8f6f6; --teal-border: #90d0d0; --teal-dot: #1a9090;
+    --gray-bg: #f4f4f1; --gray-border: #ddddd8;
+  }
+
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--text); background: var(--page-bg); }
+
+  /* BANNER */
+  .banner {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--black); height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+  }
+  .banner img { height: 28px; }
+  .banner-right { text-align: right; }
+  .banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .1em; text-transform: uppercase; }
+  .banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 64px; z-index: 99;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 32px;
+  }
+  .nav-tab {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--text-3); padding: 14px 18px; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap;
+  }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--black); }
+  .nav-tab:hover:not(.active) { color: var(--text-2); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 40px 32px; max-width: 1200px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* SECTION LABELS + TITLES */
+  .section-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 4px; }
+  .section-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .section-rule { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
+
+  /* CALLOUT BLOCKS */
+  .callout {
+    border-left: 3px solid; border-radius: 0 8px 8px 0;
+    padding: 12px 16px; margin-bottom: 12px; font-size: 13px; line-height: 1.6;
+  }
+  .callout b { font-weight: 600; }
+  .callout-green { background: var(--green-bg); border-color: var(--green-dot); color: var(--green-text); }
+  .callout-blue { background: var(--blue-bg); border-color: var(--blue-dot); color: var(--blue-text); }
+  .callout-amber { background: var(--amber-bg); border-color: var(--amber-dot); color: var(--amber-text); }
+  .callout-red { background: var(--red-bg); border-color: var(--red-dot); color: var(--red-text); }
+  .callout-purple { background: var(--purple-bg); border-color: var(--purple-dot); color: var(--purple-text); }
+  .callout-teal { background: var(--teal-bg); border-color: var(--teal-dot); color: var(--teal-text); }
+
+  /* METRIC CARDS */
+  .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; border-top: 3px solid; }
+  .metric-card.green { border-top-color: var(--green-dot); }
+  .metric-card.blue { border-top-color: var(--blue-dot); }
+  .metric-card.amber { border-top-color: var(--amber-dot); }
+  .metric-card.gray { border-top-color: var(--text-hint); }
+  .metric-card.red { border-top-color: var(--red-dot); }
+  .metric-num { font-size: 28px; font-weight: 600; margin-bottom: 4px; }
+  .metric-card.green .metric-num { color: var(--green-text); }
+  .metric-card.blue .metric-num { color: var(--blue-text); }
+  .metric-card.amber .metric-num { color: var(--amber-text); }
+  .metric-card.gray .metric-num { color: var(--text-3); }
+  .metric-card.red .metric-num { color: var(--red-text); }
+  .metric-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+  .metric-sub { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500;
+    padding: 3px 9px; border-radius: 4px; border: 1px solid; letter-spacing: .04em;
+  }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge-green { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .badge-green::before { background: var(--green-dot); }
+  .badge-blue { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue-text); }
+  .badge-blue::before { background: var(--blue-dot); }
+  .badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+  .badge-amber::before { background: var(--amber-dot); }
+  .badge-red { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .badge-red::before { background: var(--red-dot); }
+  .badge-gray { background: var(--gray-bg); border-color: var(--gray-border); color: var(--text-3); }
+  .badge-gray::before { background: var(--text-hint); }
+  .badge-purple { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
+  .badge-purple::before { background: var(--purple-dot); }
+  .badge-teal { background: var(--teal-bg); border-color: var(--teal-border); color: var(--teal-text); }
+  .badge-teal::before { background: var(--teal-dot); }
+
+  /* TABLES */
+  .table-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { background: var(--black); }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .1em; padding: 12px 16px; text-align: left; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--page-bg); }
+  tbody td { padding: 12px 16px; font-size: 13px; color: var(--text-2); vertical-align: top; }
+  td.col-id { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-3); }
+  td.col-name { font-weight: 500; color: var(--text); }
+  td.col-code { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blue-text); }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card-sm { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; }
+
+  /* WORKSTREAM MAP */
+  .ws-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .ws-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; border-top: 3px solid; }
+  .ws-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+  .ws-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .ws-why { font-size: 12px; color: var(--text-2); line-height: 1.55; margin-bottom: 10px; }
+  .ws-produces { font-size: 11px; color: var(--text-3); border-top: 1px solid var(--border); padding-top: 8px; }
+  .ws-produces span { color: var(--text-2); }
+
+  /* KANBAN */
+  .kanban-wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
+  .kb-col {}
+  .kb-col-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px 12px; border-radius: 6px; }
+  .kb-col-head.bn { background: var(--green-bg); }
+  .kb-col-head.ba { background: var(--amber-bg); }
+  .kb-col-head.vl { background: var(--blue-bg); }
+  .kb-col-head.ig { background: var(--gray-bg); }
+  .kb-col-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+  .kb-col-head.bn .kb-col-title { color: var(--green-text); }
+  .kb-col-head.ba .kb-col-title { color: var(--amber-text); }
+  .kb-col-head.vl .kb-col-title { color: var(--blue-text); }
+  .kb-col-head.ig .kb-col-title { color: var(--text-3); }
+  .kb-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 6px; border-radius: 3px; }
+  .kb-col-head.bn .kb-count { background: rgba(37,160,94,.15); color: var(--green-text); }
+  .kb-col-head.ba .kb-count { background: rgba(200,136,14,.15); color: var(--amber-text); }
+  .kb-col-head.vl .kb-count { background: rgba(46,108,196,.15); color: var(--blue-text); }
+  .kb-col-head.ig .kb-count { background: rgba(136,136,133,.15); color: var(--text-3); }
+  .kb-cards { display: flex; flex-direction: column; gap: 6px; }
+  .kb-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .kb-ws { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .05em; margin-bottom: 4px; }
+  .ws-fc { color: var(--blue-text); } .ws-cs { color: var(--amber-text); }
+  .ws-hs { color: var(--teal-text); } .ws-sr { color: var(--red-text); }
+  .ws-ai { color: var(--purple-text); } .ws-br { color: #993556; }
+  .kb-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .kb-assum { font-size: 10px; color: var(--text-hint); margin-top: 4px; font-style: italic; }
+
+  /* ASSUMPTION CARDS */
+  .assume-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; }
+  .assume-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+  .assume-topic { font-size: 14px; font-weight: 600; color: var(--text); }
+  .assume-body { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 12px; }
+  .assume-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .assume-box { background: var(--page-bg); border-radius: 6px; padding: 10px 12px; }
+  .assume-box-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 5px; }
+  .assume-box-text { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+
+  /* DECISION PRIORITY */
+  .dec-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 10px; }
+  .dec-today { border-left-color: var(--red-dot); }
+  .dec-week { border-left-color: var(--amber-dot); }
+  .dec-later { border-left-color: var(--text-hint); }
+  .dec-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+  .dec-today .dec-label { color: var(--red-text); }
+  .dec-week .dec-label { color: var(--amber-text); }
+  .dec-later .dec-label { color: var(--text-3); }
+  .dec-text { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .dec-why { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  /* 48H PLAN */
+  .plan-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+  .plan-time { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .plan-action { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .plan-action:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .plan-num { width: 26px; height: 26px; border-radius: 50%; background: var(--blue-bg); border: 1px solid var(--blue-border); color: var(--blue-text); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .plan-do { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .plan-detail { font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 5px; }
+  .chat-tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid; }
+  .chat-fc { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue-text); }
+  .chat-cs { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+  .chat-hs { background: var(--teal-bg); border-color: var(--teal-border); color: var(--teal-text); }
+  .chat-br { background: #FBEAF0; border-color: #ED93B1; color: #993556; }
+  .chat-sr { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .chat-ct { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
+
+  /* PRIORITY ORDER */
+  .priority-item { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; }
+  .p-num { font-size: 22px; font-weight: 600; color: var(--text-hint); min-width: 28px; line-height: 1.2; font-family: 'IBM Plex Mono', monospace; }
+  .p-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .p-reason { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  /* FOOTER */
+  .footer { background: var(--black); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; margin-top: 60px; }
+  .footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: .08em; }
+
+  /* THREE-COL CALLOUT ROW */
+  .callout-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+
+  /* STAKEHOLDER BLOCK */
+  .stakeholder { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .stakeholder-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  .avatar-purple { background: var(--purple-bg); color: var(--purple-text); }
+  .avatar-teal { background: var(--teal-bg); color: var(--teal-text); }
+  .stakeholder-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .stakeholder-role { font-size: 12px; color: var(--text-3); }
+  .stakeholder.purple-accent { border-top: 3px solid var(--purple-dot); }
+  .stakeholder.teal-accent { border-top: 3px solid var(--teal-dot); }
+
+  /* INFRA LIST */
+  .infra-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .infra-item:last-child { border-bottom: none; }
+  .infra-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; font-weight: 600; }
+  .infra-icon.done { background: var(--green-bg); color: var(--green-text); }
+  .infra-icon.partial { background: var(--amber-bg); color: var(--amber-text); }
+  .infra-icon.todo { background: var(--gray-bg); border: 1px solid var(--gray-border); color: var(--text-hint); }
+
+  /* OWNERSHIP LADDER */
+  .ladder { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .ladder-phase { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid; border-radius: 0 0 8px 8px; padding: 14px; }
+  .ladder-phase.now { border-top-color: var(--teal-dot); }
+  .ladder-phase.m1 { border-top-color: var(--blue-dot); }
+  .ladder-phase.m2 { border-top-color: var(--purple-dot); }
+  .ladder-phase-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .ladder-phase.now .ladder-phase-label { color: var(--teal-text); }
+  .ladder-phase.m1 .ladder-phase-label { color: var(--blue-text); }
+  .ladder-phase.m2 .ladder-phase-label { color: var(--purple-text); }
+  .ladder-item { font-size: 12px; color: var(--text-2); padding: 3px 0; padding-left: 10px; position: relative; line-height: 1.4; }
+  .ladder-item::before { content: '·'; position: absolute; left: 0; color: var(--text-hint); }
+
+  @media (max-width: 768px) {
+    .section { padding: 24px 16px; }
+    .kanban-wrap { grid-template-columns: repeat(2, 1fr); }
+    .callout-row { grid-template-columns: 1fr; }
+    .assume-row { grid-template-columns: 1fr; }
+    .ladder { grid-template-columns: 1fr; }
+    .banner { padding: 0 16px; }
+    .nav { padding: 0 16px; }
+    .footer { padding: 12px 16px; flex-direction: column; gap: 4px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<header class="banner">
+  <img src="data:image/jpeg;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-right">
+    <div class="banner-title">Operations Control Tower</div>
+    <div class="banner-version">v2.0 · Decision Engine</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="showTab('system-brief', this)">System Brief</div>
+  <div class="nav-tab" onclick="showTab('assumptions', this)">Assumption Layer</div>
+  <div class="nav-tab" onclick="showTab('kanban', this)">Kanban Board</div>
+  <div class="nav-tab" onclick="showTab('decisions', this)">Decision Priority</div>
+  <div class="nav-tab" onclick="showTab('plan48', this)">48-Hour Plan</div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ SYSTEM BRIEF ═══ -->
+<section id="system-brief" class="section active">
+  <div class="section-eyebrow">Program Overview</div>
+  <div class="section-title">Operations Control Tower — v2</div>
+  <hr class="section-rule">
+
+  <p style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:20px;max-width:700px;">
+    Hritsko is a scaling product business with a real bottleneck: packaging and fulfillment throughput. The founder is overloaded. Operations lack structure. This system exists to fix the bottleneck, create visibility, install repeatable control, and free Eric to sell.
+  </p>
+
+  <div class="callout-row">
+    <div class="callout callout-green"><b>What it solves.</b> Packaging chaos, order visibility gaps, and reliance on memory instead of systems.</div>
+    <div class="callout callout-blue"><b>What it enables.</b> Leighanna operating independently, Eric focused on sales, first hire onboarding cleanly.</div>
+    <div class="callout callout-purple"><b>How it scales.</b> Core system unchanged at 2x–5x. Only layers around it evolve. Nothing gets rebuilt from scratch.</div>
+  </div>
+
+  <div class="section-eyebrow" style="margin-top:32px;">Stakeholders</div>
+  <div class="section-title">People + Roles</div>
+  <hr class="section-rule">
+
+  <!-- PHIL -->
+  <div class="stakeholder purple-accent">
+    <div class="stakeholder-header">
+      <div class="avatar avatar-purple">PH</div>
+      <div>
+        <div class="stakeholder-name">Phil</div>
+        <div class="stakeholder-role">System Architect — invisible infrastructure designer</div>
+      </div>
+      <div style="margin-left:auto"><span class="badge badge-purple">Strategic Lead</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Designs the architecture. Does not appear as the operator. All outputs are framed to enable Leighanna — not to position Phil as the solution.</p>
+
+    <div class="section-eyebrow">Infrastructure Status</div>
+    <div style="margin:10px 0 16px;">
+      <div class="infra-item"><div class="infra-icon done">✓</div><span><b>Control tower architecture</b> — designed and live</span></div>
+      <div class="infra-item"><div class="infra-icon done">✓</div><span><b>Volume-mode system</b> — 3-mode design complete (Low / Mid / High)</span></div>
+      <div class="infra-item"><div class="infra-icon done">✓</div><span><b>Assumption layer</b> — all critical unknowns addressed, work unblocked</span></div>
+      <div class="infra-item"><div class="infra-icon partial">~</div><span><b>Batch ID logic</b> — format defined (SKU-YYMMDD-###), not yet confirmed</span></div>
+      <div class="infra-item"><div class="infra-icon partial">~</div><span><b>Google Sheet v1</b> — structure designed, not yet built</span></div>
+      <div class="infra-item"><div class="infra-icon todo">○</div><span><b>Packaging checklist v1</b> — not yet created</span></div>
+      <div class="infra-item"><div class="infra-icon todo">○</div><span><b>QA checkpoint flow</b> — not yet defined</span></div>
+      <div class="infra-item"><div class="infra-icon todo">○</div><span><b>First hire JD</b> — not yet written</span></div>
+    </div>
+
+    <div class="callout callout-amber" style="margin-bottom:12px;"><b>Watch at 30 days.</b> If volume is growing and Leighanna is still the only operator, throughput will hit the single-operator ceiling. The hire decision cannot wait.</div>
+    <div class="callout callout-purple"><b>Watch at 2x volume.</b> The Google Sheet coordination ceiling hits when two operators log simultaneously. ShipStation must be live before operator #3 starts.</div>
+  </div>
+
+  <!-- LEIGHANNA -->
+  <div class="stakeholder teal-accent">
+    <div class="stakeholder-header">
+      <div class="avatar avatar-teal">LE</div>
+      <div>
+        <div class="stakeholder-name">Leighanna</div>
+        <div class="stakeholder-role">Operations Lead — visible operator and emerging executive</div>
+      </div>
+      <div style="margin-left:auto"><span class="badge badge-teal">Execution Owner</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Owns fulfillment execution, packaging QA, hourly worker management, and customer communication. Evolving from operator to operations lead. Needs clarity, structure, and repeatable systems — not instructions she needs to memorize.</p>
+
+    <div class="section-eyebrow">Document Map</div>
+    <div class="table-wrap" style="margin:10px 0 16px;">
+      <table>
+        <thead><tr><th style="width:30%">Section</th><th style="width:35%">What it is</th><th style="width:35%">Your role</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">Assumption Layer</td><td>How we proceed without perfect info</td><td>Correct assumptions where wrong</td></tr>
+          <tr><td class="col-name">Kanban Board</td><td>What's being built and what's next</td><td>See what's ready to execute</td></tr>
+          <tr><td class="col-name">Decision Priority</td><td>What must be decided today vs. later</td><td>Make the 3 decisions flagged as today</td></tr>
+          <tr><td class="col-name">48-Hour Plan</td><td>Exact actions in exact order</td><td>Execute Steps 4–7 this week</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-eyebrow">Ownership Ladder</div>
+    <div class="ladder">
+      <div class="ladder-phase now">
+        <div class="ladder-phase-label">Now</div>
+        <div class="ladder-item">Pack orders daily</div>
+        <div class="ladder-item">Apply labels + log batch IDs</div>
+        <div class="ladder-item">Run QA gates on every order</div>
+        <div class="ladder-item">Close the sheet at end of day</div>
+      </div>
+      <div class="ladder-phase m1">
+        <div class="ladder-phase-label">Month 1</div>
+        <div class="ladder-item">Manage first hourly hire</div>
+        <div class="ladder-item">QA verifier (not packer)</div>
+        <div class="ladder-item">Resolve daily exceptions</div>
+        <div class="ladder-item">Report pack metrics to Eric</div>
+      </div>
+      <div class="ladder-phase m2">
+        <div class="ladder-phase-label">Month 2+</div>
+        <div class="ladder-item">Manage team, not tasks</div>
+        <div class="ladder-item">Own ops metrics + reporting</div>
+        <div class="ladder-item">Drive system improvements</div>
+        <div class="ladder-item">Hire and train autonomously</div>
+      </div>
+    </div>
+
+    <div class="callout callout-teal" style="margin-top:16px;"><b>What this system does for you.</b> Removes the need to hold every order in your head. The sheet tells you what's pending. The checklist tells you what to do next. The batch log proves what was done. You stop relying on memory and start relying on the system.</div>
+  </div>
+
+  <!-- WORKSTREAM MAP -->
+  <div class="section-eyebrow" style="margin-top:32px;">System Map</div>
+  <div class="section-title">All Workstreams</div>
+  <hr class="section-rule">
+
+  <div class="ws-grid">
+    <div class="ws-card" style="border-top-color:var(--blue-dot)">
+      <div class="ws-card-header"><span class="ws-name">1 · Fulfillment Control System</span><span class="badge badge-blue">In Progress</span></div>
+      <div class="ws-why">Core bottleneck fix. Order → batch → shipment linkage. Where the bleeding happens.</div>
+      <div class="ws-produces">Produces: <span>Batch ID logic, Google Sheet v1, packaging checklist, QA checkpoints, shipment verification</span></div>
+    </div>
+    <div class="ws-card" style="border-top-color:var(--amber-dot)">
+      <div class="ws-card-header"><span class="ws-name">2 · Current State Mapping</span><span class="badge badge-amber">Build w/ Assumption</span></div>
+      <div class="ws-why">Draft map in place. Leighanna corrects. Faster than building from blank.</div>
+      <div class="ws-produces">Produces: <span>As-is workflow diagram, tool inventory, pain point list, SKU/volume baseline</span></div>
+    </div>
+    <div class="ws-card" style="border-top-color:var(--teal-dot)">
+      <div class="ws-card-header"><span class="ws-name">3 · Hiring, Staffing & Throughput</span><span class="badge badge-green">Build Now</span></div>
+      <div class="ws-why">Role definition is volume-independent. JD can be written and posted immediately.</div>
+      <div class="ws-produces">Produces: <span>Packaging associate JD, onboarding checklist, hourly management cadence</span></div>
+    </div>
+    <div class="ws-card" style="border-top-color:var(--red-dot)">
+      <div class="ws-card-header"><span class="ws-name">4 · Scale Risk & Failure Points</span><span class="badge badge-amber">Build w/ Assumption</span></div>
+      <div class="ws-why">Failure modes at 2x are predictable. Document now, validate severity later.</div>
+      <div class="ws-produces">Produces: <span>Top 5 failure modes, 2x stress-test map, mitigation priorities</span></div>
+    </div>
+    <div class="ws-card" style="border-top-color:var(--purple-dot)">
+      <div class="ws-card-header"><span class="ws-name">5 · AI Leverage Layer</span><span class="badge badge-amber">Build w/ Assumption</span></div>
+      <div class="ws-why">Design the map now. Wire it in once the manual system exists.</div>
+      <div class="ws-produces">Produces: <span>AI leverage map, prompt library stubs, automation trigger list</span></div>
+    </div>
+    <div class="ws-card" style="border-top-color:#993556">
+      <div class="ws-card-header"><span class="ws-name">6 · Branding / Artifact Layer</span><span class="badge badge-amber">Build w/ Assumption</span></div>
+      <div class="ws-why">Label template structure is standard. Build now, update when SKU list is confirmed.</div>
+      <div class="ws-produces">Produces: <span>Label template v1, SOP format standard, internal document system</span></div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber"><b>New rule — no blocked workstreams.</b> Missing information is addressed through stated assumptions. We build, Leighanna corrects. A draft that is 80% right beats a blank page waiting for a perfect brief.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ASSUMPTIONS ═══ -->
+<section id="assumptions" class="section">
+  <div class="section-eyebrow">Decision Architecture</div>
+  <div class="section-title">Assumption Layer</div>
+  <hr class="section-rule">
+
+  <div class="callout callout-blue" style="margin-bottom:24px;"><b>Operating principle.</b> We do not block progress waiting for perfect information. Every assumption is labeled, reasonable, and reversible. If an assumption is wrong, the fix is a column or a tab — not a new system.</div>
+
+  <div class="assume-card">
+    <div class="assume-header">
+      <div class="assume-topic">Order volume + velocity</div>
+      <span class="badge badge-green">Proceed</span>
+    </div>
+    <div class="assume-body">Assumption: 20–60 orders/week today, targeting 2x in 6 months. Reasonable for a small product business under scale pressure with a founder still in the fulfillment loop.</div>
+    <div class="assume-row">
+      <div class="assume-box"><div class="assume-box-label">What we build on this</div><div class="assume-box-text">Single-operator Google Sheet. Manual batch log. Simple 3-step QA checkpoint.</div></div>
+      <div class="assume-box"><div class="assume-box-label">If wrong — much higher volume</div><div class="assume-box-text">Sheet gets a 2nd operator tab. Batch logic expands. Hiring urgency increases immediately.</div></div>
+    </div>
+  </div>
+
+  <div class="assume-card">
+    <div class="assume-header">
+      <div class="assume-topic">Tools in use today</div>
+      <span class="badge badge-green">Proceed</span>
+    </div>
+    <div class="assume-body">Assumption: Shopify for orders, no dedicated WMS, no ShipStation, order tracking in email or memory. This matches the "unstructured ops" description and is most common at this growth stage.</div>
+    <div class="assume-row">
+      <div class="assume-box"><div class="assume-box-label">What we build on this</div><div class="assume-box-text">Google Sheets as the ops layer. Manual order pull from Shopify. CSV export as the bridge.</div></div>
+      <div class="assume-box"><div class="assume-box-label">If wrong — has ShipStation</div><div class="assume-box-text">Sheet structure stays. We add a ShipStation sync column. Minimal rework — under 30 min.</div></div>
+    </div>
+  </div>
+
+  <div class="assume-card">
+    <div class="assume-header">
+      <div class="assume-topic">SKU complexity + lot tracking</div>
+      <span class="badge badge-green">Proceed</span>
+    </div>
+    <div class="assume-body">Assumption: 5–20 active SKUs. Some have lot/expiration relevance (consumables). No current regulatory obligation for formal traceability, but risk exists. We design for it — cost is near zero.</div>
+    <div class="assume-row">
+      <div class="assume-box"><div class="assume-box-label">What we build on this</div><div class="assume-box-text">Batch ID includes SKU + date + sequence. Lot field on every label. One row per batch in the log.</div></div>
+      <div class="assume-box"><div class="assume-box-label">If wrong — more SKUs or complex</div><div class="assume-box-text">Batch ID logic extends. Label template gets a variant field. Sheet adds a SKU-lookup tab.</div></div>
+    </div>
+  </div>
+
+  <div class="assume-card">
+    <div class="assume-header">
+      <div class="assume-topic">Current packaging team</div>
+      <span class="badge badge-amber">Watch</span>
+    </div>
+    <div class="assume-body">Assumption: Leighanna + Eric are the current packaging team. No dedicated hourly worker yet. This is why throughput is bottlenecked — two people wearing too many hats.</div>
+    <div class="assume-row">
+      <div class="assume-box"><div class="assume-box-label">What we build on this</div><div class="assume-box-text">Checklists designed for 1 operator. First hire role is packaging-first. Hiring chat starts this week.</div></div>
+      <div class="assume-box"><div class="assume-box-label">If wrong — has hourly help</div><div class="assume-box-text">Checklists become training tools immediately. Hiring chat pivots to management, not recruiting.</div></div>
+    </div>
+  </div>
+
+  <div class="assume-card">
+    <div class="assume-header">
+      <div class="assume-topic">Leighanna's biggest pain point</div>
+      <span class="badge badge-green">Proceed</span>
+    </div>
+    <div class="assume-body">Assumption: No visibility into order status and packaging inconsistency. She doesn't know what's been packed, what's pending, or what's shipped without checking manually each time.</div>
+    <div class="assume-row">
+      <div class="assume-box"><div class="assume-box-label">What we build on this</div><div class="assume-box-text">Order status column in Google Sheet. Pack log with timestamp. Simple daily status view.</div></div>
+      <div class="assume-box"><div class="assume-box-label">If wrong — different pain point</div><div class="assume-box-text">We pivot the sheet's primary view. Core structure unchanged — just reorder the columns.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ KANBAN ═══ -->
+<section id="kanban" class="section">
+  <div class="section-eyebrow">Execution Layer</div>
+  <div class="section-title">Kanban Board v2 — No Card Sits Idle</div>
+  <hr class="section-rule">
+
+  <p style="font-size:13px;color:var(--text-2);margin-bottom:20px;">Every card is in one of four states. Nothing waits for information. Assumptions are labeled on the card. Build, then correct.</p>
+
+  <div class="kanban-wrap">
+    <!-- BUILD NOW -->
+    <div class="kb-col">
+      <div class="kb-col-head bn"><span class="kb-col-title">Build Now</span><span class="kb-count">7</span></div>
+      <div class="kb-cards">
+        <div class="kb-card"><div class="kb-ws ws-fc">FULFILLMENT</div><div class="kb-text">Define batch ID logic — format + generation rules</div></div>
+        <div class="kb-card"><div class="kb-ws ws-fc">FULFILLMENT</div><div class="kb-text">Build Google Sheet v1 — orders, batches, pack log tabs</div></div>
+        <div class="kb-card"><div class="kb-ws ws-fc">FULFILLMENT</div><div class="kb-text">Build packaging checklist v1 — 10 steps max</div></div>
+        <div class="kb-card"><div class="kb-ws ws-fc">FULFILLMENT</div><div class="kb-text">Define 3-step QA checkpoint flow</div></div>
+        <div class="kb-card"><div class="kb-ws ws-hs">HIRING</div><div class="kb-text">Write packaging associate job description</div></div>
+        <div class="kb-card"><div class="kb-ws ws-hs">HIRING</div><div class="kb-text">Build hourly worker onboarding checklist v1</div></div>
+        <div class="kb-card"><div class="kb-ws ws-hs">HIRING</div><div class="kb-text">Define Leighanna's daily management cadence</div></div>
+      </div>
+    </div>
+
+    <!-- BUILD WITH ASSUMPTION -->
+    <div class="kb-col">
+      <div class="kb-col-head ba"><span class="kb-col-title">Build w/ Assumption</span><span class="kb-count">6</span></div>
+      <div class="kb-cards">
+        <div class="kb-card"><div class="kb-ws ws-cs">CURRENT STATE</div><div class="kb-text">Draft as-is flow map (Leighanna corrects)</div><div class="kb-assum">Assumes: Shopify + manual tracking</div></div>
+        <div class="kb-card"><div class="kb-ws ws-sr">SCALE RISK</div><div class="kb-text">Map top 5 failure modes at 2x volume</div><div class="kb-assum">Assumes: 20–60 orders/wk baseline</div></div>
+        <div class="kb-card"><div class="kb-ws ws-sr">SCALE RISK</div><div class="kb-text">Build 2x stress-test + mitigation list</div><div class="kb-assum">Assumes: 2-person team today</div></div>
+        <div class="kb-card"><div class="kb-ws ws-ai">AI LAYER</div><div class="kb-text">Map AI leverage opportunities by workstream</div><div class="kb-assum">Assumes: manual layer built first</div></div>
+        <div class="kb-card"><div class="kb-ws ws-br">BRANDING</div><div class="kb-text">Build label template v1 with batch/lot fields</div><div class="kb-assum">Assumes: 5–20 SKUs, exp date required</div></div>
+        <div class="kb-card"><div class="kb-ws ws-br">BRANDING</div><div class="kb-text">Define SOP document format standard</div><div class="kb-assum">Assumes: Leighanna-first audience</div></div>
+      </div>
+    </div>
+
+    <!-- VALIDATE LATER -->
+    <div class="kb-col">
+      <div class="kb-col-head vl"><span class="kb-col-title">Validate Later</span><span class="kb-count">4</span></div>
+      <div class="kb-cards">
+        <div class="kb-card"><div class="kb-ws ws-cs">CURRENT STATE</div><div class="kb-text">Confirm exact order volume + growth target</div></div>
+        <div class="kb-card"><div class="kb-ws ws-cs">CURRENT STATE</div><div class="kb-text">Confirm tools in use today (Shopify, ShipStation, etc.)</div></div>
+        <div class="kb-card"><div class="kb-ws ws-cs">CURRENT STATE</div><div class="kb-text">Confirm full SKU list + lot/exp requirements</div></div>
+        <div class="kb-card"><div class="kb-ws ws-ai">AI LAYER</div><div class="kb-text">Identify AI integration points post-manual v1</div></div>
+      </div>
+    </div>
+
+    <!-- IGNORE FOR NOW -->
+    <div class="kb-col">
+      <div class="kb-col-head ig"><span class="kb-col-title">Ignore for Now</span><span class="kb-count">3</span></div>
+      <div class="kb-cards">
+        <div class="kb-card"><div class="kb-ws ws-ai">AI LAYER</div><div class="kb-text">Barcode / QR scan-based workflows</div></div>
+        <div class="kb-card"><div class="kb-ws ws-sr">SCALE RISK</div><div class="kb-text">5x scale planning — 10x volume scenarios</div></div>
+        <div class="kb-card"><div class="kb-ws ws-fc">FULFILLMENT</div><div class="kb-text">ERP or WMS evaluation</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-green"><b>Rule.</b> Before any card moves to "Ignore for Now," ask: does ignoring this create technical debt or a harder retrofit later? If yes, it belongs in "Validate Later," not ignored.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ DECISIONS ═══ -->
+<section id="decisions" class="section">
+  <div class="section-eyebrow">Decision Engine</div>
+  <div class="section-title">Priority Order — What to Decide When</div>
+  <hr class="section-rule">
+
+  <div class="callout callout-red" style="margin-bottom:24px;"><b>Three decisions must be made today.</b> They unlock 6+ downstream outputs. Waiting costs days of build time and compounds.</div>
+
+  <div class="dec-item dec-today">
+    <div class="dec-label">Decide today — unlocks 6 outputs</div>
+    <div class="dec-text">Lock the batch ID format</div>
+    <div class="dec-why">Everything downstream — labels, sheet, QA gates, traceability — is built around this. Recommended: <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue-text)">SKU-YYMMDD-###</span>. One decision unlocks the entire build. Override only if a specific format already exists.</div>
+  </div>
+  <div class="dec-item dec-today">
+    <div class="dec-label">Decide today — sets the ops layer</div>
+    <div class="dec-text">Google Sheet as v1 ops layer — confirm or override</div>
+    <div class="dec-why">Sheets is the assumption. If a tool already exists, we pivot now — not after building the Sheet structure. Five-minute decision that saves hours of rework.</div>
+  </div>
+  <div class="dec-item dec-today">
+    <div class="dec-label">Decide today — changes build target</div>
+    <div class="dec-text">Is Leighanna starting execution this week — yes or no</div>
+    <div class="dec-why">If yes, build everything for immediate handoff and hands-on use. If no, Phil builds the skeleton and Leighanna corrects remotely. Changes the format and urgency of every deliverable.</div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="dec-item dec-week">
+    <div class="dec-label">Decide this week</div>
+    <div class="dec-text">First hire: post now or wait 30 days</div>
+    <div class="dec-why">If volume is growing, waiting costs throughput. The role is defined regardless of volume. Posting takes 20 minutes. This decision affects week 2 planning entirely.</div>
+  </div>
+  <div class="dec-item dec-week">
+    <div class="dec-label">Decide this week</div>
+    <div class="dec-text">Label format: printed, handwritten, or hybrid</div>
+    <div class="dec-why">Drives the branding artifacts and QA checkpoint design. Low-cost decision but must be made before the label template is finalized.</div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="dec-item dec-later">
+    <div class="dec-label">Decide later — not urgent</div>
+    <div class="dec-text">Barcode / QR scan infrastructure</div>
+    <div class="dec-why">Right system at the wrong time. Manual first. Scan-based only makes sense after volume proves the need — and after operator #2 is in place.</div>
+  </div>
+  <div class="dec-item dec-later">
+    <div class="dec-label">Decide later — not urgent</div>
+    <div class="dec-text">AI automation layer specifics</div>
+    <div class="dec-why">Map it now, wire it in at week 3+. Do not automate a system that does not exist yet.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ 48H PLAN ═══ -->
+<section id="plan48" class="section">
+  <div class="section-eyebrow">Execution Mode</div>
+  <div class="section-title">48-Hour Plan — Exact Actions in Order</div>
+  <hr class="section-rule">
+
+  <div class="callout callout-blue" style="margin-bottom:24px;"><b>Optimizing for speed, learning, and iteration.</b> Not perfect design upfront. Each step produces something real. The system is never idle.</div>
+
+  <div class="plan-block">
+    <div class="plan-time">Hours 0–4 · Today</div>
+    <div class="plan-action">
+      <div class="plan-num">1</div>
+      <div>
+        <div class="plan-do">Confirm Google Sheet as v1 ops layer</div>
+        <div class="plan-detail">One message in Fulfillment chat. Assumption is yes. Override only if a tool already exists. Locks the build environment.</div>
+        <span class="chat-tag chat-fc">Fulfillment Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">2</div>
+      <div>
+        <div class="plan-do">Lock batch ID format: SKU-YYMMDD-###</div>
+        <div class="plan-detail">30-second decision. Write it down. This is the spine of the entire traceability system. Everything else is built on top of it.</div>
+        <span class="chat-tag chat-fc">Fulfillment Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">3</div>
+      <div>
+        <div class="plan-do">Build Google Sheet v1 skeleton — 3 tabs</div>
+        <div class="plan-detail">Orders tab (Order ID, SKU, Qty, Status, Batch ID, Packed by, Shipped date). Batch Log tab. Pack Log tab with timestamp. Under 30 minutes. Phil builds using assumptions.</div>
+        <span class="chat-tag chat-fc">Fulfillment Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-block">
+    <div class="plan-time">Hours 4–12 · Today (continued)</div>
+    <div class="plan-action">
+      <div class="plan-num">4</div>
+      <div>
+        <div class="plan-do">Build packaging checklist v1 — 10 steps maximum</div>
+        <div class="plan-detail">Pull order → confirm SKU → check quantity → pack → apply label → verify batch ID → QA gate → seal → log in sheet → stage for shipment. Each step is a checkbox, not prose.</div>
+        <span class="chat-tag chat-fc">Fulfillment Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">5</div>
+      <div>
+        <div class="plan-do">Build draft current-state flow map using assumptions</div>
+        <div class="plan-detail">Leighanna reviews and corrects. Faster than building from a blank slate. The marked-up version is more valuable than a perfect draft built slowly.</div>
+        <span class="chat-tag chat-cs">Current State Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-block">
+    <div class="plan-time">Hours 12–24 · Tonight / Tomorrow morning</div>
+    <div class="plan-action">
+      <div class="plan-num">6</div>
+      <div>
+        <div class="plan-do">Leighanna reviews + corrects the draft flow map</div>
+        <div class="plan-detail">Marks what's wrong, what's missing, what's right. Returns corrections in Current State chat. This closes the biggest knowledge gap in the entire system design.</div>
+        <span class="chat-tag chat-cs">Current State Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">7</div>
+      <div>
+        <div class="plan-do">Write packaging associate job description v1</div>
+        <div class="plan-detail">Role: pack orders, apply labels, log batches, flag QA issues. 30 hours/week. Reports to Leighanna. Does not require confirmed volume — scope is stable regardless.</div>
+        <span class="chat-tag chat-hs">Hiring Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-block">
+    <div class="plan-time">Hours 24–48 · Day 2</div>
+    <div class="plan-action">
+      <div class="plan-num">8</div>
+      <div>
+        <div class="plan-do">Build label template v1 — product name, SKU, batch ID, lot, exp</div>
+        <div class="plan-detail">Assumption-based field set. Leighanna confirms what's missing. Produces a branded, printable template ready for immediate use on the pack floor.</div>
+        <span class="chat-tag chat-br">Branding Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">9</div>
+      <div>
+        <div class="plan-do">Map top 5 scale failure points at 2x volume</div>
+        <div class="plan-detail">Based on current assumptions and the volume-mode architecture. Produces the risk register that guides every system design decision going forward.</div>
+        <span class="chat-tag chat-sr">Scale Risk Chat</span>
+      </div>
+    </div>
+    <div class="plan-action">
+      <div class="plan-num">10</div>
+      <div>
+        <div class="plan-do">Update control tower with all outputs from Steps 1–9</div>
+        <div class="plan-detail">Paste results here. Board updates. Kanban cards move. New priorities surface. The control tower stays current and reflects real progress.</div>
+        <span class="chat-tag chat-ct">This Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-green"><b>Success condition for the 48-hour window.</b> Google Sheet is live. Batch ID format is locked. Packaging checklist exists. Draft flow map has been reviewed by Leighanna. Hiring chat has a JD draft. That is a real operational system in 48 hours.</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Hritsko Operations Control Tower · v2.0 · Internal Use Only</span>
+  <span>March 2026</span>
+</footer>
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
