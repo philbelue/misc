@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hritsko Fulfillment Control System v1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#0c0c0c;
+  --white:#ffffff;
+  --bg:#f5f4f0;
+  --surface:#ffffff;
+  --border:#e2e1dc;
+  --border2:#ccccc6;
+  --text:#1a1a1a;
+  --text2:#4a4948;
+  --text3:#8a8a85;
+  --text4:#b8b7b2;
+
+  --green:#1a6e42;
+  --green-bg:#eaf5f0;
+  --green-border:#a8dcc0;
+  --green-dot:#25a05e;
+  --green-mid:#d2efe2;
+
+  --blue:#1a4f8a;
+  --blue-bg:#eaf0f9;
+  --blue-border:#a8c4e8;
+  --blue-dot:#2e6cc4;
+  --blue-mid:#ccdff2;
+
+  --amber:#7a4d08;
+  --amber-bg:#fdf5e6;
+  --amber-border:#f0d080;
+  --amber-dot:#c8880e;
+  --amber-mid:#faeabf;
+
+  --red:#8a1f1f;
+  --red-bg:#fdf0f0;
+  --red-border:#f0aaaa;
+  --red-dot:#cc3333;
+
+  --purple:#4a2880;
+  --purple-bg:#f2eefb;
+  --purple-border:#c4aeed;
+  --purple-dot:#6e48c0;
+  --purple-mid:#ddd4f5;
+
+  --teal:#0d5c5c;
+  --teal-bg:#e8f6f6;
+  --teal-border:#90d0d0;
+  --teal-dot:#1a9090;
+
+  --font:'Inter',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+html{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+body{max-width:1040px;margin:0 auto;padding-bottom:80px}
+
+/* ── BANNER ── */
+.banner{background:var(--black);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.banner-logo{height:28px;width:auto}
+.banner-right{display:flex;align-items:center;gap:20px}
+.banner-label{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.14em;text-transform:uppercase}
+.banner-version{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.2)}
+
+/* ── NAV ── */
+.nav-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;position:sticky;top:0;z-index:50;gap:0}
+.nav-tab{padding:14px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap;user-select:none}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--text);border-bottom-color:var(--black)}
+
+/* ── PAGE ── */
+.page{display:none;padding:36px 40px}
+.page.active{display:block}
+
+/* ── VIEW HEADER ── */
+.view-header{margin-bottom:32px;padding-bottom:22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.view-title{font-size:21px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.2}
+.view-sub{font-size:13px;color:var(--text3);font-weight:400;line-height:1.5}
+.view-tag{font-family:var(--mono);font-size:10px;border-radius:4px;padding:4px 10px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;margin-top:3px;flex-shrink:0}
+.tag-active{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.tag-exec{color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-border)}
+.tag-ref{color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-border)}
+.tag-brief{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-border)}
+
+/* ── SECTION ── */
+.section{margin-bottom:40px}
+.s-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:5px}
+.s-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.35}
+.s-rule{height:1px;background:var(--border);margin-bottom:20px}
+
+/* ── CALLOUT BLOCKS ── */
+.callout{border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:12px;border-left:3px solid;font-size:13px;line-height:1.65}
+.co-amber{background:var(--amber-bg);border-left-color:var(--amber-dot);color:var(--amber)}
+.co-green{background:var(--green-bg);border-left-color:var(--green-dot);color:var(--green)}
+.co-blue{background:var(--blue-bg);border-left-color:var(--blue-dot);color:var(--blue)}
+.co-purple{background:var(--purple-bg);border-left-color:var(--purple-dot);color:var(--purple)}
+.callout strong{font-weight:600;color:inherit}
+.callout p{margin-top:6px;margin-bottom:0}
+
+/* ── PERSON SECTIONS ── */
+.person-block{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.person-header{padding:18px 22px;display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid var(--border)}
+.person-avatar{width:40px;height:40px;min-width:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0}
+.av-eric{background:var(--purple-mid);color:var(--purple)}
+.av-leigh{background:var(--teal-bg);color:var(--teal)}
+.person-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
+.person-role{font-size:12px;color:var(--text3)}
+.person-body{padding:20px 22px;background:var(--white)}
+.person-body-teal{padding:20px 22px;background:#f5fbfb}
+
+/* ── BUILD STATUS LIST ── */
+.build-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:4px}
+.build-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.build-item:last-child{border-bottom:none}
+.build-status{width:18px;height:18px;min-width:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.bs-done{background:var(--green-bg);border:1.5px solid var(--green-border);color:var(--green)}
+.bs-partial{background:var(--amber-bg);border:1.5px solid var(--amber-border);color:var(--amber-dot)}
+.bs-todo{background:var(--bg);border:1.5px solid var(--border2);color:var(--text4)}
+.build-text{color:var(--text2);flex:1}
+.build-note{font-size:11px;color:var(--text4);font-family:var(--mono)}
+
+/* ── DOC MAP ── */
+.doc-map{display:flex;flex-direction:column;gap:0}
+.doc-map-row{display:grid;grid-template-columns:160px 1fr 1fr;gap:0;border-bottom:1px solid var(--border);align-items:stretch}
+.doc-map-row:last-child{border-bottom:none}
+.doc-map-row.header-row{background:var(--black)}
+.doc-map-row.header-row .dmc{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);padding:9px 14px;border-right:1px solid rgba(255,255,255,0.08)}
+.dmc{padding:11px 14px;font-size:13px;border-right:1px solid var(--border);color:var(--text2);line-height:1.5}
+.dmc:last-child{border-right:none}
+.dmc-name{font-weight:600;color:var(--text);margin-bottom:1px;font-size:13px}
+.dmc-pill{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;margin-top:3px}
+
+/* ── OWNERSHIP LADDER ── */
+.ladder{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:4px}
+.ladder-step{flex:1;padding:14px 16px;border-right:1px solid var(--border);background:var(--white);position:relative}
+.ladder-step:last-child{border-right:none}
+.ladder-num{font-family:var(--mono);font-size:10px;color:var(--text4);margin-bottom:6px;letter-spacing:.06em}
+.ladder-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ladder-desc{font-size:12px;color:var(--text3);line-height:1.5}
+.ladder-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:0}
+.la-now{background:var(--teal-dot)}
+.la-next{background:var(--blue-dot)}
+.la-own{background:var(--purple-dot)}
+
+/* ── METRIC CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:28px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px 18px;border-top:3px solid transparent}
+.stat.pend{border-top-color:var(--amber-dot)}
+.stat.pack{border-top-color:var(--blue-dot)}
+.stat.ready{border-top-color:var(--green-dot)}
+.stat.hold{border-top-color:var(--red-dot)}
+.stat-num{font-size:28px;font-weight:600;line-height:1;margin-bottom:4px}
+.stat-num.pend{color:var(--amber)}
+.stat-num.pack{color:var(--blue)}
+.stat-num.ready{color:var(--green)}
+.stat-num.hold{color:var(--red)}
+.stat-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+
+/* ── WORKFLOW STEPS ── */
+.steps{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)}
+.step{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num-col{width:48px;min-width:48px;background:var(--bg);border-right:1px solid var(--border);display:flex;align-items:flex-start;justify-content:center;padding-top:17px;font-family:var(--mono);font-size:11px;color:var(--text4);font-weight:500}
+.step-body{padding:14px 20px;flex:1}
+.step-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.step-sub{font-size:13px;color:var(--text2);line-height:1.6}
+.step-gate{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:3px 9px;border-radius:4px;font-weight:500}
+.gate-warn{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-border)}
+.gate-ok{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.gate-icon{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px 22px}
+.card-sm{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-bottom:8px;font-size:13px;color:var(--text2);line-height:1.6}
+.card-sm strong{color:var(--text);font-weight:600}
+
+/* ── CHECKLIST ── */
+.cl-group-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);padding:10px 0 8px;margin-top:4px;border-top:1px solid var(--border);display:block}
+.cl-group-label:first-child{border-top:none;margin-top:0;padding-top:0}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:2px}
+.checklist li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text2);line-height:1.5}
+.cb{width:16px;height:16px;min-width:16px;border:1.5px solid var(--border2);border-radius:4px;background:var(--white);margin-top:1px;cursor:pointer;transition:all .1s;flex-shrink:0}
+.cb:hover{border-color:var(--black)}
+.cb.checked{background:var(--black);border-color:var(--black)}
+.sign-row{display:flex;gap:24px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.sign-field{font-size:12px;color:var(--text3)}
+.sign-line{display:inline-block;width:72px;border-bottom:1px solid var(--border2);margin-left:6px;vertical-align:bottom}
+
+/* ── TABLES ── */
+.tbl-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.tbl-wrap thead{background:var(--black)}
+.tbl-wrap th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);padding:10px 14px}
+.tbl-wrap td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top}
+.tbl-wrap tr:last-child td{border-bottom:none}
+.tbl-wrap tr:hover td{background:var(--bg)}
+.col-key{font-weight:500}
+.mono{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.ex{font-family:var(--mono);font-size:11px;color:var(--blue)}
+
+.order-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.order-tbl thead{background:var(--black)}
+.order-tbl th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);padding:9px 12px}
+.order-tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.order-tbl tr:last-child td{border-bottom:none}
+.order-tbl tr:hover td{background:var(--bg)}
+.order-tbl .hold-row td{background:var(--red-bg)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;flex-shrink:0}
+.b-pending{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-border)}
+.b-packing{color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-border)}
+.b-ready{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.b-hold{color:var(--red);background:var(--red-bg);border:1px solid var(--red-border)}
+.b-released{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.b-shipped{color:var(--text3);background:var(--bg);border:1px solid var(--border)}
+
+/* ── MISC ── */
+.tab-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);border-radius:4px;padding:3px 9px;display:inline-block;margin-bottom:10px}
+.batch-vis{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:14px 0}
+.bv-seg{flex:1;padding:14px 16px;background:var(--white);border-right:1px solid var(--border);text-align:center}
+.bv-seg:last-child{border-right:none}
+.bv-val{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text);display:block;margin-bottom:4px}
+.bv-label{font-size:11px;color:var(--text3)}
+.bv-sep{display:flex;align-items:center;padding:0;font-family:var(--mono);font-size:14px;color:var(--border2);background:var(--bg);width:22px;min-width:22px;justify-content:center;border-right:1px solid var(--border)}
+.fail-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)}
+.fail-item{display:flex;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.fail-item:last-child{border-bottom:none}
+.fail-dot{width:8px;height:8px;min-width:8px;border-radius:50%;background:var(--red-dot);margin-top:5px}
+.fail-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.fail-fix{font-size:13px;color:var(--text2);line-height:1.55}
+.fail-fix strong{color:var(--text);font-weight:600}
+.week-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)}
+.week-row{display:flex;align-items:baseline;gap:16px;padding:12px 18px;border-bottom:1px solid var(--border)}
+.week-row:last-child{border-bottom:none}
+.week-day{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:90px;font-weight:500}
+.week-task{font-size:13px;color:var(--text2);flex:1;line-height:1.5}
+.week-time{font-family:var(--mono);font-size:10px;color:var(--text4);white-space:nowrap}
+.act-btn{background:transparent;border:1px solid var(--border2);border-radius:5px;padding:4px 11px;font-size:11px;font-family:var(--mono);color:var(--text3);cursor:pointer;transition:all .12s}
+.act-btn:hover{background:var(--black);color:var(--white);border-color:var(--black)}
+.divider{height:1px;background:var(--border);margin:36px 0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.sku-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sku-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.sku-name{color:var(--text2)}
+.sku-code{font-family:var(--mono);font-size:11px;color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:3px;padding:2px 7px}
+.doc-footer{background:var(--black);padding:16px 40px;display:flex;justify-content:space-between;align-items:center;margin-top:60px}
+.footer-text{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <img class="banner-logo" src="data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-right">
+    <span class="banner-label">Fulfillment Control System</span>
+    <span class="banner-version">v1.0 &nbsp;·&nbsp; 2026-03-21</span>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <div class="nav-tab active" onclick="switchView('brief',this)">System Brief</div>
+  <div class="nav-tab" onclick="switchView('operator',this)">Operator View</div>
+  <div class="nav-tab" onclick="switchView('executive',this)">Executive View</div>
+  <div class="nav-tab" onclick="switchView('reference',this)">Reference</div>
+</div>
+
+<!-- ═════════════════════════════ SYSTEM BRIEF ═════════════════════════════ -->
+<div class="page active" id="view-brief">
+
+  <div class="view-header">
+    <div>
+      <div class="view-title">System Brief</div>
+      <div class="view-sub">Context, ownership, and intent — read this before using the rest of the document.</div>
+    </div>
+    <div class="view-tag tag-brief">Start here</div>
+  </div>
+
+  <!-- WHY THIS EXISTS -->
+  <div class="section">
+    <div class="s-label">Why this system exists</div>
+    <div class="s-rule"></div>
+    <div class="callout co-amber">
+      <strong>The bottleneck is not production — it is packaging and fulfillment.</strong>
+      <p>Hritsko can make product faster than it can package and ship it. Without a defined system, that gap creates wrong shipments, untraceable errors, and a founder who is executing instead of selling. This document is the fix.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px">
+      <div class="callout co-green" style="margin-bottom:0"><strong>What it solves</strong><p>Wrong product, wrong label, and shipments that can't be traced back to a batch if something goes wrong.</p></div>
+      <div class="callout co-blue" style="margin-bottom:0"><strong>What it enables</strong><p>Eric focused on growth. Leighanna assisting with ops—adding structure and visibility so the floor runs without daily firefighting.</p></div>
+      <div class="callout co-purple" style="margin-bottom:0"><strong>Built for scale</strong><p>Designed modularly. Start with Google Sheets. Add scan workflows, forms, and automation as volume grows.</p></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ERIC SECTION -->
+  <div class="section">
+    <div class="s-label">For Eric — Strategic context</div>
+    <div class="s-title">Where things stand and where this goes</div>
+    <div class="s-rule"></div>
+    <div class="person-block">
+      <div class="person-header" style="background:#faf9ff">
+        <div class="person-avatar av-eric">E</div>
+        <div>
+          <div class="person-name">Eric</div>
+          <div class="person-role">Co-founder &nbsp;·&nbsp; Strategic oversight</div>
+        </div>
+      </div>
+      <div class="person-body" style="padding:22px">
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">This system assumes you have some operational infrastructure already in place and some you're still building. The table below reflects a honest read of where things are. Adjust it as reality changes — this is a living document, not a one-time audit.</p>
+
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Infrastructure status</div>
+        <div class="build-list">
+          <div class="build-item">
+            <div class="build-status bs-done">&#10003;</div>
+            <div class="build-text"><strong>Production process</strong> — product is being made consistently</div>
+            <div class="build-note">in place</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-partial">&#8764;</div>
+            <div class="build-text"><strong>Order intake</strong> — orders are coming in but not formally tracked or logged</div>
+            <div class="build-note">partial</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-partial">&#8764;</div>
+            <div class="build-text"><strong>Batch / lot tracking</strong> — batches are being made but IDs are informal or undefined</div>
+            <div class="build-note">partial</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-todo">&#8203;</div>
+            <div class="build-text"><strong>Packaging control workflow</strong> — no formal step-by-step process with checkpoints</div>
+            <div class="build-note">to build</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-todo">&#8203;</div>
+            <div class="build-text"><strong>QA / release protocol</strong> — no defined second-check before shipment</div>
+            <div class="build-note">to build</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-todo">&#8203;</div>
+            <div class="build-text"><strong>Label verification</strong> — no formal process to confirm label matches product before seal</div>
+            <div class="build-note">to build</div>
+          </div>
+          <div class="build-item">
+            <div class="build-status bs-todo">&#8203;</div>
+            <div class="build-text"><strong>Shipment traceability</strong> — no link between shipment, order, and batch on record</div>
+            <div class="build-note">to build</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="callout co-purple" style="margin-bottom:0">
+            <strong>What to watch at 30 days</strong>
+            <p>QA failure rate dropping to zero. No mislabeled shipments. Leighanna able to run a pack day without founder involvement. Status visible without asking.</p>
+          </div>
+          <div class="callout co-blue" style="margin-bottom:0">
+            <strong>What to watch at 2x volume</strong>
+            <p>Pack Log bottleneck (fix: Google Form). Batch running short mid-pack (fix: qty warnings). Status lag (fix: Apps Script auto-update). These are known and planned.</p>
+          </div>
+        </div>
+
+        <div class="callout co-amber" style="margin-top:12px;margin-bottom:0">
+          <strong>This system is designed to be adjusted.</strong> If a step doesn't fit reality, change it. The structure matters more than the exact format. The non-negotiables are: every order has an ID, every order links to a batch, nothing ships without a QA sign-off.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- LEIGHANNA SECTION -->
+  <div class="section">
+    <div class="s-label">For Leighanna — Document map &amp; ownership</div>
+    <div class="s-title">How this document is organized and where you come in</div>
+    <div class="s-rule"></div>
+    <div class="person-block">
+      <div class="person-header" style="background:#f4fbfb">
+        <div class="person-avatar av-leigh">L</div>
+        <div>
+          <div class="person-name">Leighanna</div>
+          <div class="person-role">Operations lead &nbsp;·&nbsp; System owner</div>
+        </div>
+      </div>
+      <div class="person-body-teal">
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">You've opened restaurants, managed teams under pressure, and built operations from scratch. This system isn't here to tell you how to do your job — it's here to give the operation a structure that scales with you. Below is a plain-language map of every section in this document, what it does, and where your ownership lives.</p>
+
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:8px">Document map</div>
+        <div class="tbl-wrap" style="margin-bottom:18px">
+          <div class="doc-map">
+            <div class="doc-map-row header-row">
+              <div class="dmc">Section</div>
+              <div class="dmc">What it is</div>
+              <div class="dmc">Your role in it</div>
+            </div>
+            <div class="doc-map-row">
+              <div class="dmc"><div class="dmc-name">System Brief</div><div><span class="dmc-pill" style="background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)">this page</span></div></div>
+              <div class="dmc">Context for why this system exists and what it's solving. The "before you start" page.</div>
+              <div class="dmc">Read once. Reference when onboarding someone new or explaining the system to a partner.</div>
+            </div>
+            <div class="doc-map-row">
+              <div class="dmc"><div class="dmc-name">Operator View</div><div><span class="dmc-pill" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)">daily use</span></div></div>
+              <div class="dmc">The step-by-step workflow, packaging checklist, and QA release check. Your daily operating guide.</div>
+              <div class="dmc">You run this every pack day. You'll also be the one who trains operators on it and holds the standard.</div>
+            </div>
+            <div class="doc-map-row">
+              <div class="dmc"><div class="dmc-name">Executive View</div><div><span class="dmc-pill" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)">daily check</span></div></div>
+              <div class="dmc">Live order queue, batch inventory, and status counts. The fast-read dashboard.</div>
+              <div class="dmc">You keep this accurate. The data it shows is only as good as what you log. It's also your tool for flagging problems early.</div>
+            </div>
+            <div class="doc-map-row">
+              <div class="dmc"><div class="dmc-name">Reference</div><div><span class="dmc-pill" style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)">build guide</span></div></div>
+              <div class="dmc">Every sheet column, the batch ID format, failure points, and the launch plan.</div>
+              <div class="dmc">Use this to build the Google Sheet and set up the system. Once it's running, you'll use it to onboard new people and troubleshoot issues.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:8px">How your role grows with the system</div>
+        <div class="ladder">
+          <div class="ladder-step">
+            <div class="ladder-accent la-now"></div>
+            <div class="ladder-num">Week 1–2</div>
+            <div class="ladder-title">Build &amp; run</div>
+            <div class="ladder-desc">Set up the sheet. Run your first pack days through the system. Find what needs adjusting.</div>
+          </div>
+          <div class="ladder-step">
+            <div class="ladder-accent la-next"></div>
+            <div class="ladder-num">Month 1</div>
+            <div class="ladder-title">Own &amp; enforce</div>
+            <div class="ladder-desc">You are the QA gate. Batch IDs assigned by you. Standards enforced by you. Nothing ships without your sign-off.</div>
+          </div>
+          <div class="ladder-step">
+            <div class="ladder-accent la-own"></div>
+            <div class="ladder-num">Month 2+</div>
+            <div class="ladder-title">Teach &amp; manage</div>
+            <div class="ladder-desc">Train incoming operators using this document. Improve the system based on what you've learned. You become the system.</div>
+          </div>
+        </div>
+
+        <div class="callout co-green" style="margin-top:14px;margin-bottom:0">
+          <strong>The most important thing this system does for you:</strong> it gives you a paper trail. Every error is logged, every batch is traceable, every sign-off is on record. That's not bureaucracy — that's how you protect yourself and the team when something goes wrong.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═════════════════════════════ OPERATOR VIEW ═════════════════════════════ -->
+<div class="page" id="view-operator">
+  <div class="view-header">
+    <div>
+      <div class="view-title">Operator View</div>
+      <div class="view-sub">Leighanna — daily execution guide. Follow in sequence. Do not skip steps.</div>
+    </div>
+    <div class="view-tag tag-active">Active</div>
+  </div>
+
+  <div class="section">
+    <div class="s-label">01 · Core workflow</div>
+    <div class="s-title">How every order moves</div>
+    <div class="s-rule"></div>
+    <div class="steps">
+      <div class="step"><div class="step-num-col">01</div><div class="step-body"><div class="step-title">Order received</div><div class="step-sub">Log to ORDERS tab: Order ID · Customer · SKU · Qty · Date. Set status: <strong>PENDING</strong>.</div></div></div>
+      <div class="step"><div class="step-num-col">02</div><div class="step-body"><div class="step-title">Assign batch ID</div><div class="step-sub">Find the correct batch in BATCHES tab. Confirm QA Status = RELEASED. Enter the Batch ID into Column H on the order row.</div><span class="step-gate gate-warn"><span class="gate-icon"></span>Gate: batch not released = do not pack</span></div></div>
+      <div class="step"><div class="step-num-col">03</div><div class="step-body"><div class="step-title">Pack the order</div><div class="step-sub">Follow the packaging checklist. Every item must be checked before sealing. Update status to <strong>PACKING</strong>.</div></div></div>
+      <div class="step"><div class="step-num-col">04</div><div class="step-body"><div class="step-title">Log and stage for QA</div><div class="step-sub">Fill in the PACK LOG row completely. Sign initials. Move the package to the QA staging area — not the outbound pile.</div><span class="step-gate gate-warn"><span class="gate-icon"></span>Gate: no log entry = order does not move forward</span></div></div>
+      <div class="step"><div class="step-num-col">05</div><div class="step-body"><div class="step-title">QA release</div><div class="step-sub">Second person (not the packer) verifies. Signs initials. Sets status to <strong>READY</strong>. Moves package to outbound.</div><span class="step-gate gate-warn"><span class="gate-icon"></span>Gate: no QA sign-off = does not ship</span></div></div>
+      <div class="step"><div class="step-num-col">06</div><div class="step-body"><div class="step-title">Ship and close</div><div class="step-sub">Hand to carrier. Log Shipment ID + Tracking # in SHIPMENTS tab. Set Order status to <strong>SHIPPED</strong>.</div><span class="step-gate gate-ok"><span class="gate-icon"></span>Done — record closed</span></div></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="s-label">02 · Packaging checklist</div>
+      <div class="s-title">Before sealing the package</div>
+      <div class="s-rule"></div>
+      <div class="card">
+        <span class="cl-group-label">Before touching product</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Order ID and Batch ID are both filled in on the order row</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Batch QA Status = RELEASED in Batches tab</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Batch container label matches the Batch ID exactly</li>
+        </ul>
+        <span class="cl-group-label">Product &amp; label</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Product matches order SKU — read the name, do not assume</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Quantity counted twice</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Label name matches product SKU</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Shipping label shows correct customer name</li>
+        </ul>
+        <span class="cl-group-label">Final</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Package fully sealed, no gaps</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Pack Log row filled in, initials signed</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Package moved to QA staging area</li>
+        </ul>
+        <div class="sign-row">
+          <div class="sign-field">Packed by:<span class="sign-line"></span></div>
+          <div class="sign-field">Date:<span class="sign-line" style="width:80px"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="s-label">03 · QA / release check</div>
+      <div class="s-title">Before handing to carrier</div>
+      <div class="s-rule"></div>
+      <div class="card">
+        <span class="cl-group-label">Batch release — once per batch</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Batch ID, date, product, and qty logged in Batches tab</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Product visually inspected — no defects</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Batches tab QA Status updated to RELEASED</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Initials and release date logged</li>
+        </ul>
+        <span class="cl-group-label">Order release — per order</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Pack Log row fully filled in (all YES columns)</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Physical check: correct product, label, sealed</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Shipping label shows correct customer and address</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Order status updated to READY</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Tracking number logged in Shipments tab</li>
+        </ul>
+        <span class="cl-group-label">If QA fails</span>
+        <ul class="checklist">
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Mark Pack Log QA Result = FAIL, enter reason</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Return to packing area — do not delete the failed row</li>
+          <li><div class="cb" onclick="this.classList.toggle('checked')"></div>Repack → new Pack Log row → resubmit to QA</li>
+        </ul>
+        <div class="sign-row">
+          <div class="sign-field">QA by:<span class="sign-line"></span></div>
+          <div class="sign-field">Date:<span class="sign-line" style="width:80px"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════ EXECUTIVE VIEW ═════════════════════════════ -->
+<div class="page" id="view-executive">
+  <div class="view-header">
+    <div>
+      <div class="view-title">Executive View</div>
+      <div class="view-sub">Eric — what is happening, what is stuck, what is done.</div>
+    </div>
+    <div class="view-tag tag-exec" id="exec-date-badge">Today</div>
+  </div>
+  <div class="section">
+    <div class="s-label">Today's status</div>
+    <div class="s-rule"></div>
+    <div class="stat-grid">
+      <div class="stat pend"><div class="stat-num pend" id="cnt-pending">—</div><div class="stat-label">Pending</div></div>
+      <div class="stat pack"><div class="stat-num pack" id="cnt-packing">—</div><div class="stat-label">Packing</div></div>
+      <div class="stat ready"><div class="stat-num ready" id="cnt-ready">—</div><div class="stat-label">Ready to ship</div></div>
+      <div class="stat hold"><div class="stat-num hold" id="cnt-hold">—</div><div class="stat-label">On hold</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="s-label">Order queue</div>
+    <div class="s-rule"></div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red-bg);border:1px solid var(--red-border)"></div>Hold — blocked</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green-bg);border:1px solid var(--green-border)"></div>Ready to ship</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--blue-bg);border:1px solid var(--blue-border)"></div>Packing</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></div>Pending</div>
+    </div>
+    <div class="tbl-wrap" style="padding:0">
+      <table class="order-tbl"><thead><tr>
+        <th style="width:94px">Order</th><th>Customer</th><th style="width:88px">SKU</th>
+        <th style="width:158px">Batch ID</th><th style="width:92px">Status</th>
+        <th style="width:110px;text-align:right">Action</th>
+      </tr></thead><tbody id="exec-tbody"></tbody></table>
+    </div>
+  </div>
+  <div class="section">
+    <div class="s-label">Batch inventory</div>
+    <div class="s-rule"></div>
+    <div class="tbl-wrap" style="padding:0">
+      <table class="order-tbl"><thead><tr>
+        <th style="width:168px">Batch ID</th><th>Product</th>
+        <th style="width:65px">Made</th><th style="width:120px">Remaining</th>
+        <th style="width:110px">QA Status</th>
+      </tr></thead><tbody id="exec-btbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════ REFERENCE ═════════════════════════════ -->
+<div class="page" id="view-reference">
+  <div class="view-header">
+    <div>
+      <div class="view-title">Reference</div>
+      <div class="view-sub">Full system spec — sheet structure, batch ID logic, failure points, launch plan.</div>
+    </div>
+    <div class="view-tag tag-ref">Build guide</div>
+  </div>
+
+  <div class="section">
+    <div class="s-label">01 · Google Sheet structure</div>
+    <div class="s-title">Five tabs. Build exactly as shown.</div>
+    <div class="s-rule"></div>
+
+    <div class="tab-pill">Tab 1 · Orders</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:40px">Col</th><th style="width:150px">Name</th><th>Purpose</th><th style="width:160px">Example</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A</td><td class="col-key">Order ID</td><td style="color:var(--text2)">Unique order reference. Auto-increment.</td><td class="ex">ORD-0047</td></tr>
+        <tr><td class="mono">B</td><td class="col-key">Date Received</td><td style="color:var(--text2)">When order came in.</td><td class="ex">2026-03-21</td></tr>
+        <tr><td class="mono">C</td><td class="col-key">Channel</td><td style="color:var(--text2)">Origin of the order.</td><td class="ex">Shopify / Wholesale</td></tr>
+        <tr><td class="mono">D</td><td class="col-key">Customer Name</td><td style="color:var(--text2)">Ship-to name.</td><td class="ex">Green Apron Market</td></tr>
+        <tr><td class="mono">E</td><td class="col-key">SKU</td><td style="color:var(--text2)">Exact product code. Must match Batches tab.</td><td class="ex">HR-12OZ</td></tr>
+        <tr><td class="mono">F</td><td class="col-key">Product Name</td><td style="color:var(--text2)">Human-readable product name.</td><td class="ex">House Rub 12oz</td></tr>
+        <tr><td class="mono">G</td><td class="col-key">Qty Ordered</td><td style="color:var(--text2)">Units ordered.</td><td class="ex">24</td></tr>
+        <tr><td class="mono">H</td><td class="col-key">Batch ID</td><td style="color:var(--text2)">Links to Batches tab. Set before packing starts.</td><td class="ex">HR-2026-0321-001</td></tr>
+        <tr><td class="mono">I</td><td class="col-key">Pack Date</td><td style="color:var(--text2)">Date physically packed.</td><td class="ex">2026-03-22</td></tr>
+        <tr><td class="mono">J</td><td class="col-key">QA By</td><td style="color:var(--text2)">Initials of QA sign-off person.</td><td class="ex">LB</td></tr>
+        <tr><td class="mono">K</td><td class="col-key">Status</td><td style="color:var(--text2)">Updated at each stage. Source of truth for Dashboard.</td><td class="ex">PENDING / PACKING / READY / SHIPPED / HOLD</td></tr>
+        <tr><td class="mono">L</td><td class="col-key">Notes</td><td style="color:var(--text2)">Anything unusual about this order.</td><td class="ex">Double-seal requested</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tab-pill">Tab 2 · Batches</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:40px">Col</th><th style="width:150px">Name</th><th>Purpose</th><th style="width:160px">Example</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A</td><td class="col-key">Batch ID</td><td style="color:var(--text2)">Unique batch reference. See ID format below.</td><td class="ex">HR-2026-0321-001</td></tr>
+        <tr><td class="mono">B</td><td class="col-key">Product Name</td><td style="color:var(--text2)">What was produced.</td><td class="ex">House Rub 12oz</td></tr>
+        <tr><td class="mono">C</td><td class="col-key">SKU</td><td style="color:var(--text2)">Product code. Must match Orders tab.</td><td class="ex">HR-12OZ</td></tr>
+        <tr><td class="mono">D</td><td class="col-key">Date Made</td><td style="color:var(--text2)">Production date.</td><td class="ex">2026-03-21</td></tr>
+        <tr><td class="mono">E</td><td class="col-key">Qty Made</td><td style="color:var(--text2)">Units produced in this batch.</td><td class="ex">144</td></tr>
+        <tr><td class="mono">F</td><td class="col-key">Qty Remaining</td><td style="color:var(--text2)">Available units. Conditional format: amber below 20, red below 5.</td><td class="ex">96</td></tr>
+        <tr><td class="mono">G</td><td class="col-key">QA Status</td><td style="color:var(--text2)">Batch-level gate. Must = RELEASED before packing begins.</td><td class="ex">PENDING / RELEASED / HOLD</td></tr>
+        <tr><td class="mono">H</td><td class="col-key">Released By</td><td style="color:var(--text2)">Initials of person who cleared the batch.</td><td class="ex">LB</td></tr>
+        <tr><td class="mono">I</td><td class="col-key">Release Date</td><td style="color:var(--text2)">Date batch was cleared for packing.</td><td class="ex">2026-03-21</td></tr>
+        <tr><td class="mono">J</td><td class="col-key">Notes</td><td style="color:var(--text2)">Anything unusual about this batch.</td><td class="ex">Slight color variation — approved</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tab-pill">Tab 3 · Pack Log</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:40px">Col</th><th style="width:150px">Name</th><th>Purpose</th><th style="width:160px">Example</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A</td><td class="col-key">Pack Record ID</td><td style="color:var(--text2)">Unique log row. Auto-increment. Never delete rows.</td><td class="ex">PKG-0089</td></tr>
+        <tr><td class="mono">B</td><td class="col-key">Date</td><td style="color:var(--text2)">Date packed.</td><td class="ex">2026-03-22</td></tr>
+        <tr><td class="mono">C</td><td class="col-key">Order ID</td><td style="color:var(--text2)">Links to Orders tab Column A.</td><td class="ex">ORD-0047</td></tr>
+        <tr><td class="mono">D</td><td class="col-key">Batch ID</td><td style="color:var(--text2)">Links to Batches tab Column A.</td><td class="ex">HR-2026-0321-001</td></tr>
+        <tr><td class="mono">E</td><td class="col-key">SKU Confirmed</td><td style="color:var(--text2)">Operator verified correct product.</td><td class="ex">YES / NO</td></tr>
+        <tr><td class="mono">F</td><td class="col-key">Label Confirmed</td><td style="color:var(--text2)">Label matches order SKU.</td><td class="ex">YES / NO</td></tr>
+        <tr><td class="mono">G</td><td class="col-key">Qty Confirmed</td><td style="color:var(--text2)">Count matches order quantity.</td><td class="ex">YES / NO</td></tr>
+        <tr><td class="mono">H</td><td class="col-key">Sealed</td><td style="color:var(--text2)">Package fully closed.</td><td class="ex">YES / NO</td></tr>
+        <tr><td class="mono">I</td><td class="col-key">Packed By</td><td style="color:var(--text2)">Operator initials.</td><td class="ex">JR</td></tr>
+        <tr><td class="mono">J</td><td class="col-key">QA By</td><td style="color:var(--text2)">Second-person check. Must not be the packer.</td><td class="ex">LB</td></tr>
+        <tr><td class="mono">K</td><td class="col-key">QA Result</td><td style="color:var(--text2)">Final status of this pack record.</td><td class="ex">PASS / FAIL</td></tr>
+        <tr><td class="mono">L</td><td class="col-key">Fail Reason</td><td style="color:var(--text2)">If FAIL: describe what was wrong. Row stays permanently.</td><td class="ex">Label had wrong SKU</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tab-pill">Tab 4 · Shipments</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:40px">Col</th><th style="width:150px">Name</th><th>Purpose</th><th style="width:160px">Example</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A</td><td class="col-key">Shipment ID</td><td style="color:var(--text2)">Unique shipment reference.</td><td class="ex">SHIP-0031</td></tr>
+        <tr><td class="mono">B</td><td class="col-key">Ship Date</td><td style="color:var(--text2)">Date handed to carrier.</td><td class="ex">2026-03-22</td></tr>
+        <tr><td class="mono">C</td><td class="col-key">Order ID</td><td style="color:var(--text2)">Links to Orders tab.</td><td class="ex">ORD-0047</td></tr>
+        <tr><td class="mono">D</td><td class="col-key">Batch ID</td><td style="color:var(--text2)">Traceability anchor. Links to Batches tab.</td><td class="ex">HR-2026-0321-001</td></tr>
+        <tr><td class="mono">E</td><td class="col-key">Carrier</td><td style="color:var(--text2)">Shipping company.</td><td class="ex">UPS / FedEx / USPS</td></tr>
+        <tr><td class="mono">F</td><td class="col-key">Tracking Number</td><td style="color:var(--text2)">Carrier tracking number.</td><td class="ex">1Z999AA10123456784</td></tr>
+        <tr><td class="mono">G</td><td class="col-key">Shipped By</td><td style="color:var(--text2)">Initials of person who handed off.</td><td class="ex">LB</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tab-pill">Tab 5 · Dashboard</div>
+    <div class="tbl-wrap" style="margin-bottom:0"><table>
+      <thead><tr><th style="width:60px">Cell</th><th style="width:150px">Label</th><th>Formula</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">B2</td><td class="col-key">Pending</td><td class="ex">=COUNTIF(ORDERS!K:K,"PENDING")</td></tr>
+        <tr><td class="mono">B3</td><td class="col-key">Packing</td><td class="ex">=COUNTIF(ORDERS!K:K,"PACKING")</td></tr>
+        <tr><td class="mono">B4</td><td class="col-key">Ready to ship</td><td class="ex">=COUNTIF(ORDERS!K:K,"READY")</td></tr>
+        <tr><td class="mono">B5</td><td class="col-key">On hold</td><td class="ex">=COUNTIF(ORDERS!K:K,"HOLD")</td></tr>
+        <tr><td class="mono">B6</td><td class="col-key">Shipped today</td><td class="ex">=COUNTIFS(SHIPMENTS!B:B,TODAY())</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="s-label">02 · Batch ID format</div>
+    <div class="s-title">How to read and create a Batch ID</div>
+    <div class="s-rule"></div>
+    <div class="batch-vis">
+      <div class="bv-seg"><span class="bv-val">HR</span><div class="bv-label">SKU prefix</div></div>
+      <div class="bv-sep">–</div>
+      <div class="bv-seg"><span class="bv-val">2026</span><div class="bv-label">Year</div></div>
+      <div class="bv-sep">–</div>
+      <div class="bv-seg"><span class="bv-val">0321</span><div class="bv-label">MMDD production date</div></div>
+      <div class="bv-sep">–</div>
+      <div class="bv-seg"><span class="bv-val">001</span><div class="bv-label">Daily sequence</div></div>
+    </div>
+    <div class="sku-grid">
+      <div class="sku-row"><span class="sku-name">House Rub 12oz</span><span class="sku-code">HR</span></div>
+      <div class="sku-row"><span class="sku-name">BBQ Rub 8oz</span><span class="sku-code">BR</span></div>
+      <div class="sku-row"><span class="sku-name">Sweet Rub 12oz</span><span class="sku-code">SR</span></div>
+      <div class="sku-row"><span class="sku-name">Second batch same day</span><span class="sku-code">…-002</span></div>
+    </div>
+    <div class="callout co-amber" style="margin-top:12px;margin-bottom:0">Batch IDs are created in Tab 2 the day product is made — <strong>before packaging begins.</strong> Never reuse a Batch ID. To trace any issue: search the Batch ID across all tabs.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="s-label">03 · Critical failure points</div>
+    <div class="s-title">Where this breaks first</div>
+    <div class="s-rule"></div>
+    <div class="fail-list">
+      <div class="fail-item"><div class="fail-dot"></div><div><div class="fail-title">Skipping the pack log under pressure</div><div class="fail-fix"><strong>No log entry = order does not ship.</strong> Non-negotiable from day one.</div></div></div>
+      <div class="fail-item"><div class="fail-dot"></div><div><div class="fail-title">Packer self-checking QA</div><div class="fail-fix"><strong>QA sign-off must always be a second person</strong> — even 30 seconds is enough to catch a label error.</div></div></div>
+      <div class="fail-item"><div class="fail-dot"></div><div><div class="fail-title">Batch IDs not assigned before packing starts</div><div class="fail-fix"><strong>Leighanna assigns Batch IDs each morning.</strong> Operators must never guess which batch they are pulling from.</div></div></div>
+      <div class="fail-item"><div class="fail-dot"></div><div><div class="fail-title">Status columns lagging behind reality</div><div class="fail-fix">Updating status is <strong>part of the step, not optional.</strong> Stale Dashboard = bad decisions.</div></div></div>
+      <div class="fail-item"><div class="fail-dot"></div><div><div class="fail-title">No physical separation between QA and outbound</div><div class="fail-fix"><strong>Two staging areas required.</strong> Same pile = orders bypass QA entirely.</div></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="s-label">04 · Launch plan</div>
+    <div class="s-title">This week</div>
+    <div class="s-rule"></div>
+    <div class="week-list">
+      <div class="week-row"><div class="week-day">Monday</div><div class="week-task">Build the Google Sheet from this structure. All five tabs.</div><div class="week-time">~30 min</div></div>
+      <div class="week-row"><div class="week-day">Tuesday</div><div class="week-task">Back-fill open orders into Tab 1. Assign Batch IDs to all existing inventory in Tab 2.</div><div class="week-time">1–2 hrs</div></div>
+      <div class="week-row"><div class="week-day">Wednesday</div><div class="week-task">Post packaging checklist at station. Run one full order end-to-end through the system.</div><div class="week-time">First live run</div></div>
+      <div class="week-row"><div class="week-day">Thu – Fri</div><div class="week-task">All packing through the new flow. Leighanna QA signs every order before it ships.</div><div class="week-time">Full operation</div></div>
+      <div class="week-row"><div class="week-day">Friday EOD</div><div class="week-task">Note what broke or was confusing. Fix the sheet based on what actually happened.</div><div class="week-time">Retro</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="s-label">05 · Version 2 — after 2 weeks</div>
+    <div class="s-title">What to improve once it's running</div>
+    <div class="s-rule"></div>
+    <div class="card-sm"><strong>Google Form for Pack Log</strong> — replaces manual Tab 3 entry. Operator submits from phone in 45 seconds. Writes directly to the sheet. Takes one hour to build.</div>
+    <div class="card-sm"><strong>Conditional formatting on Batches!F</strong> — Qty Remaining below 20 → amber, below 5 → red. Leighanna sees low stock before it becomes a floor problem.</div>
+    <div class="card-sm"><strong>QR codes on batch containers</strong> — encode the Batch ID, print free at qr-code-generator.com. Scan to verify instead of typing. Eliminates transcription errors.</div>
+    <div class="card-sm"><strong>Errors log tab</strong> — one row per QA FAIL. After two weeks, patterns emerge: same operator, same SKU, same time of day. First training signal.</div>
+  </div>
+</div>
+
+<div class="doc-footer">
+  <span class="footer-text">Hritsko Fulfillment Control System · v1.0 · Internal Use Only</span>
+  <span class="footer-text">2026-03-21</span>
+</div>
+
+<script>
+const orders=[
+  {id:'ORD-0051',customer:'Green Apron Market',sku:'HR-12OZ',batch:'HR-2026-0321-001',status:'PENDING'},
+  {id:'ORD-0052',customer:'The Butcher Block',sku:'BR-8OZ',batch:'BR-2026-0320-001',status:'PENDING'},
+  {id:'ORD-0053',customer:'Smoke & Barrel Co.',sku:'SR-12OZ',batch:'SR-2026-0319-001',status:'PACKING'},
+  {id:'ORD-0054',customer:'Riverside Provisions',sku:'HR-12OZ',batch:'HR-2026-0321-001',status:'PACKING'},
+  {id:'ORD-0055',customer:'Eric D. (direct)',sku:'HR-12OZ',batch:'HR-2026-0321-001',status:'READY'},
+  {id:'ORD-0056',customer:'Oak & Ember BBQ',sku:'BR-8OZ',batch:'BR-2026-0320-001',status:'READY'},
+  {id:'ORD-0057',customer:'Homestead Kitchen',sku:'SR-12OZ',batch:'SR-2026-0319-001',status:'READY'},
+  {id:'ORD-0048',customer:'Fenwick Foods',sku:'BR-8OZ',batch:'BR-2026-0318-001',status:'HOLD'},
+  {id:'ORD-0049',customer:'Sunrise Deli',sku:'HR-12OZ',batch:'HR-2026-0321-001',status:'PENDING'},
+  {id:'ORD-0050',customer:'The Larder Shop',sku:'SR-12OZ',batch:'SR-2026-0319-001',status:'PENDING'},
+];
+const batches=[
+  {id:'HR-2026-0321-001',product:'House Rub 12oz',made:144,remaining:96,status:'RELEASED'},
+  {id:'BR-2026-0320-001',product:'BBQ Rub 8oz',made:72,remaining:14,status:'RELEASED'},
+  {id:'SR-2026-0319-001',product:'Sweet Rub 12oz',made:120,remaining:68,status:'RELEASED'},
+  {id:'BR-2026-0318-001',product:'BBQ Rub 8oz',made:48,remaining:48,status:'HOLD'},
+];
+const sMap={PENDING:'b-pending',PACKING:'b-packing',READY:'b-ready',HOLD:'b-hold',SHIPPED:'b-shipped'};
+const nxt={PENDING:'PACKING',PACKING:'READY',READY:'SHIPPED'};
+const nxtL={PENDING:'Start packing',PACKING:'Mark ready',READY:'Mark shipped'};
+function renderExec(){
+  const c={PENDING:0,PACKING:0,READY:0,HOLD:0};
+  orders.forEach(o=>{if(c[o.status]!==undefined)c[o.status]++});
+  document.getElementById('cnt-pending').textContent=c.PENDING;
+  document.getElementById('cnt-packing').textContent=c.PACKING;
+  document.getElementById('cnt-ready').textContent=c.READY;
+  document.getElementById('cnt-hold').textContent=c.HOLD;
+  const d=new Date();
+  document.getElementById('exec-date-badge').textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const priority=['HOLD','READY','PACKING','PENDING','SHIPPED'];
+  const sorted=[...orders].sort((a,b)=>priority.indexOf(a.status)-priority.indexOf(b.status));
+  const tbody=document.getElementById('exec-tbody');
+  tbody.innerHTML='';
+  sorted.forEach(o=>{
+    const tr=document.createElement('tr');
+    if(o.status==='HOLD')tr.className='hold-row';
+    const btn=nxt[o.status]?`<button class="act-btn" onclick="advance('${o.id}')">${nxtL[o.status]}</button>`:`<span style="font-family:var(--mono);font-size:10px;color:var(--text4)">shipped</span>`;
+    tr.innerHTML=`<td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${o.id}</td><td style="font-size:13px">${o.customer}</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${o.sku}</td><td style="font-family:var(--mono);font-size:11px;color:var(--text4)">${o.batch}</td><td><span class="badge ${sMap[o.status]}">${o.status}</span></td><td style="text-align:right;padding-right:12px">${btn}</td>`;
+    tbody.appendChild(tr);
+  });
+  const btbody=document.getElementById('exec-btbody');
+  btbody.innerHTML='';
+  batches.forEach(b=>{
+    const pct=Math.round(b.remaining/b.made*100);
+    const rs=b.remaining<5?'color:var(--red);font-weight:600':b.remaining<20?'color:var(--amber);font-weight:600':'';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${b.id}</td><td style="font-size:13px">${b.product}</td><td style="font-size:13px">${b.made}</td><td style="font-size:13px;${rs}">${b.remaining} <span style="font-family:var(--mono);font-size:10px;color:var(--text4);font-weight:400">(${pct}%)</span></td><td><span class="badge ${b.status==="RELEASED"?"b-released":"b-hold"}">${b.status}</span></td>`;
+    btbody.appendChild(tr);
+  });
+}
+function advance(id){const o=orders.find(x=>x.id===id);if(o&&nxt[o.status])o.status=nxt[o.status];renderExec();}
+function switchView(name,el){
+  document.querySelectorAll('.page').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='executive')renderExec();
+}
+renderExec();
+</script>
+</body>
+</html>
