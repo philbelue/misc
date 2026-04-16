@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hritsko — Volume-Mode Architecture v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0c0c0c;
+    --page-bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e1dc;
+    --text: #1a1a1a;
+    --text-2: #4a4948;
+    --text-3: #8a8a85;
+    --text-hint: #b8b7b2;
+    --green-text: #1a6e42; --green-bg: #eaf5f0; --green-border: #a8dcc0; --green-dot: #25a05e;
+    --blue-text: #1a4f8a; --blue-bg: #eaf0f9; --blue-border: #a8c4e8; --blue-dot: #2e6cc4;
+    --amber-text: #7a4d08; --amber-bg: #fdf5e6; --amber-border: #f0d080; --amber-dot: #c8880e;
+    --red-text: #8a1f1f; --red-bg: #fdf0f0; --red-border: #f0aaaa; --red-dot: #cc3333;
+    --purple-text: #4a2880; --purple-bg: #f2eefb; --purple-border: #c4aeed; --purple-dot: #6e48c0;
+    --teal-text: #0d5c5c; --teal-bg: #e8f6f6; --teal-border: #90d0d0; --teal-dot: #1a9090;
+    --gray-bg: #f4f4f1; --gray-border: #ddddd8;
+  }
+
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--text); background: var(--page-bg); }
+
+  /* BANNER */
+  .banner {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--black); height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+  }
+  .banner img { height: 28px; }
+  .banner-right { text-align: right; }
+  .banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .1em; text-transform: uppercase; }
+  .banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 64px; z-index: 99;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 32px;
+  }
+  .nav-tab {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--text-3); padding: 14px 18px; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap;
+  }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--black); }
+  .nav-tab:hover:not(.active) { color: var(--text-2); }
+
+  .section { display: none; padding: 40px 32px; max-width: 1200px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 4px; }
+  .section-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .section-rule { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
+
+  /* CALLOUTS */
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
+  .callout b { font-weight: 600; }
+  .callout-green { background: var(--green-bg); border-color: var(--green-dot); color: var(--green-text); }
+  .callout-blue { background: var(--blue-bg); border-color: var(--blue-dot); color: var(--blue-text); }
+  .callout-amber { background: var(--amber-bg); border-color: var(--amber-dot); color: var(--amber-text); }
+  .callout-red { background: var(--red-bg); border-color: var(--red-dot); color: var(--red-text); }
+  .callout-purple { background: var(--purple-bg); border-color: var(--purple-dot); color: var(--purple-text); }
+  .callout-teal { background: var(--teal-bg); border-color: var(--teal-dot); color: var(--teal-text); }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 4px; border: 1px solid; letter-spacing: .04em; }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge-green { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .badge-green::before { background: var(--green-dot); }
+  .badge-blue { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue-text); }
+  .badge-blue::before { background: var(--blue-dot); }
+  .badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+  .badge-amber::before { background: var(--amber-dot); }
+  .badge-red { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+  .badge-red::before { background: var(--red-dot); }
+  .badge-gray { background: var(--gray-bg); border-color: var(--gray-border); color: var(--text-3); }
+  .badge-gray::before { background: var(--text-hint); }
+
+  /* TABLES */
+  .table-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--black); }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .1em; padding: 12px 16px; text-align: left; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--page-bg); }
+  tbody td { padding: 12px 16px; font-size: 13px; color: var(--text-2); vertical-align: top; }
+  td.col-name { font-weight: 500; color: var(--text); }
+  td.col-code { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blue-text); }
+  td.col-check { font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: center; }
+  td.col-yes { color: var(--green-dot); } td.col-no { color: var(--text-hint); } td.col-add { color: var(--amber-dot); }
+
+  /* CORE SYSTEM CARDS */
+  .core-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .core-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; border-top: 3px solid var(--black); }
+  .core-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 10px; }
+  .core-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .core-desc { font-size: 12px; color: var(--text-2); line-height: 1.55; margin-bottom: 10px; }
+  .core-rule { font-size: 11px; color: var(--text-3); border-top: 1px solid var(--border); padding-top: 8px; line-height: 1.5; }
+  .core-rule b { color: var(--text-2); font-weight: 500; }
+
+  /* MODE SELECTOR */
+  .mode-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .mode-btn {
+    padding: 16px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--surface); cursor: pointer; text-align: left; transition: all .15s;
+  }
+  .mode-btn:hover { border-color: var(--text-hint); }
+  .mode-btn.active-low { background: var(--green-bg); border-color: var(--green-border); }
+  .mode-btn.active-mid { background: var(--amber-bg); border-color: var(--amber-border); }
+  .mode-btn.active-high { background: var(--red-bg); border-color: var(--red-border); }
+  .mode-btn-label { font-size: 15px; font-weight: 600; display: block; margin-bottom: 3px; }
+  .mode-btn.active-low .mode-btn-label { color: var(--green-text); }
+  .mode-btn.active-mid .mode-btn-label { color: var(--amber-text); }
+  .mode-btn.active-high .mode-btn-label { color: var(--red-text); }
+  .mode-btn:not(.active-low):not(.active-mid):not(.active-high) .mode-btn-label { color: var(--text); }
+  .mode-btn-range { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-3); display: block; }
+  .mode-btn-ops { font-size: 11px; color: var(--text-hint); display: block; margin-top: 3px; }
+
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+
+  /* MODE STATS */
+  .mode-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .mode-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; text-align: center; }
+  .mode-stat-val { font-size: 26px; font-weight: 600; }
+  .mode-stat-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+  .mode-low .mode-stat-val { color: var(--green-text); }
+  .mode-mid .mode-stat-val { color: var(--amber-text); }
+  .mode-high .mode-stat-val { color: var(--red-text); }
+
+  /* DETAIL GRID */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .detail-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .detail-box.full { grid-column: 1 / -1; }
+  .detail-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--text-hint); margin-bottom: 8px; }
+  .detail-item { font-size: 12px; color: var(--text); padding: 4px 0 4px 14px; position: relative; line-height: 1.4; border-bottom: 1px solid var(--border); }
+  .detail-item:last-child { border-bottom: none; }
+  .detail-item::before { content: '·'; position: absolute; left: 2px; color: var(--text-hint); }
+  .detail-item.good::before { content: '✓'; font-size: 9px; color: var(--green-dot); top: 5px; }
+  .detail-item.warn::before { content: '!'; font-size: 9px; color: var(--amber-dot); top: 5px; font-weight: 600; }
+  .detail-item.bad::before { content: '✕'; font-size: 9px; color: var(--red-dot); top: 5px; }
+
+  /* BREAK + TRIGGER BOXES */
+  .break-box { background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .break-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--red-text); margin-bottom: 5px; }
+  .break-text { font-size: 13px; color: var(--red-text); line-height: 1.6; }
+  .trigger-box { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 8px; padding: 14px 16px; }
+  .trigger-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--green-text); margin-bottom: 5px; }
+  .trigger-text { font-size: 13px; color: var(--green-text); line-height: 1.6; }
+
+  /* FLEX TABLE PILLS */
+  .pill { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+  .pill-all { background: var(--gray-bg); border: 1px solid var(--gray-border); color: var(--text-3); }
+  .pill-low { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green-text); }
+  .pill-mid { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber-text); }
+  .pill-high { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); }
+
+  /* BREAK POINTS PAGE */
+  .bp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 16px; }
+  .bp-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .bp-num { width: 32px; height: 32px; border-radius: 50%; background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bp-name { font-size: 15px; font-weight: 600; color: var(--text); flex: 1; }
+  .bp-trigger { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; border-radius: 4px; background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); }
+  .bp-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 14px; }
+  .bp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bp-box { border-radius: 8px; padding: 12px 14px; }
+  .bp-box.symptom { background: var(--red-bg); }
+  .bp-box.fix { background: var(--green-bg); }
+  .bp-box-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 5px; }
+  .bp-box.symptom .bp-box-lbl { color: var(--red-text); }
+  .bp-box.fix .bp-box-lbl { color: var(--green-text); }
+  .bp-box-text { font-size: 12px; line-height: 1.5; }
+  .bp-box.symptom .bp-box-text { color: var(--red-text); }
+  .bp-box.fix .bp-box-text { color: var(--green-text); }
+
+  /* NEVER CHANGES */
+  .never-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+
+  /* FOOTER */
+  .footer { background: var(--black); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; margin-top: 60px; }
+  .footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: .08em; }
+
+  @media (max-width: 768px) {
+    .section { padding: 24px 16px; }
+    .mode-row { grid-template-columns: 1fr; }
+    .mode-stats { grid-template-columns: repeat(3, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
+    .bp-grid { grid-template-columns: 1fr; }
+    .banner { padding: 0 16px; }
+    .nav { padding: 0 16px; }
+    .footer { padding: 12px 16px; flex-direction: column; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<header class="banner">
+  <img src="data:image/jpeg;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-right">
+    <div class="banner-title">Volume-Mode Architecture</div>
+    <div class="banner-version">v1.0 · Fulfillment Scale Design</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-tab active" onclick="showTab('core-system', this)">Core System</div>
+  <div class="nav-tab" onclick="showTab('mode-view', this)">Mode Breakdown</div>
+  <div class="nav-tab" onclick="showTab('flex-table', this)">What Flexes</div>
+  <div class="nav-tab" onclick="showTab('break-points', this)">Break Points</div>
+</nav>
+
+<!-- ═══════════════════════ CORE SYSTEM ═══ -->
+<section id="core-system" class="section active">
+  <div class="section-eyebrow">Architecture Foundation</div>
+  <div class="section-title">The Unchanging Core</div>
+  <hr class="section-rule">
+
+  <p style="font-size:13px;color:var(--text-2);line-height:1.7;max-width:700px;margin-bottom:20px;">The system has one spine and three shells. The spine never gets replaced. Every upgrade is additive — a layer on top, never a rebuild underneath. Design these five components right once. They survive 10, 60, and 120 orders per day identically.</p>
+
+  <div class="callout callout-purple" style="margin-bottom:28px;"><b>Design test.</b> If adding a second operator requires a new system — not a new column — the core was built wrong. Everything below passes this test.</div>
+
+  <div class="core-grid">
+    <div class="core-card">
+      <div class="core-icon" style="background:var(--blue-bg);">🏷</div>
+      <div class="core-name">Batch ID system</div>
+      <div class="core-desc">Every unit produced gets a batch ID. Format: <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--page-bg);padding:1px 5px;border-radius:4px;color:var(--blue-text)">SKU-YYMMDD-###</code>. Written on label, logged in sheet. One format forever.</div>
+      <div class="core-rule"><b>Never changes:</b> the format, the logic, and the rule that nothing ships without a batch ID present.</div>
+    </div>
+    <div class="core-card">
+      <div class="core-icon" style="background:var(--green-bg);">📋</div>
+      <div class="core-name">Packaging checklist</div>
+      <div class="core-desc">10 steps. Every order, every time. Verify SKU → check qty → pack → apply label → confirm batch ID → QA gate → seal → log → stage. The checklist is the process, not the person's memory.</div>
+      <div class="core-rule"><b>Never changes:</b> the steps. What changes is who owns each step and whether a scan or a person does the verifying.</div>
+    </div>
+    <div class="core-card">
+      <div class="core-icon" style="background:var(--teal-bg);">🔍</div>
+      <div class="core-name">3-step QA checkpoint</div>
+      <div class="core-desc">Pre-pack (right product?), mid-pack (right quantity?), pre-ship (right label + batch ID?). Three gates. Nothing leaves without clearing all three. No exceptions.</div>
+      <div class="core-rule"><b>Never changes:</b> the three gates. What changes is whether a person or a barcode scan does the checking.</div>
+    </div>
+    <div class="core-card">
+      <div class="core-icon" style="background:var(--amber-bg);">📊</div>
+      <div class="core-name">Order → batch → shipment log</div>
+      <div class="core-desc">Every order links to a batch ID. Every batch ID links to a shipment record. One row equals one order. This is both the audit trail and the daily ops dashboard simultaneously.</div>
+      <div class="core-rule"><b>Never changes:</b> the linkage model. What changes is whether it lives in a Sheet or a dedicated tool.</div>
+    </div>
+    <div class="core-card">
+      <div class="core-icon" style="background:var(--purple-bg);">👤</div>
+      <div class="core-name">Named ownership per order</div>
+      <div class="core-desc">One person is accountable for every order reaching shipped status. At low volume it's Leighanna. At high volume it's a team lead. Accountability never diffuses into "the team."</div>
+      <div class="core-rule"><b>Never changes:</b> clear ownership per order. What changes is how many named owners exist in the system.</div>
+    </div>
+  </div>
+
+  <div class="section-eyebrow">What Never Changes — Across All Volumes</div>
+  <div class="section-title">Stable Rules</div>
+  <hr class="section-rule">
+  <div class="never-grid">
+    <span class="pill pill-all">SKU-YYMMDD-### batch ID format</span>
+    <span class="pill pill-all">10-step packaging checklist</span>
+    <span class="pill pill-all">3-gate QA logic (pre / mid / pre-ship)</span>
+    <span class="pill pill-all">Order → batch → shipment linkage</span>
+    <span class="pill pill-all">One named owner per order</span>
+    <span class="pill pill-all">Nothing ships without a batch ID</span>
+    <span class="pill pill-all">Daily close-out log review</span>
+    <span class="pill pill-all">Leighanna owns operations outcome</span>
+  </div>
+  <div class="callout callout-green"><b>The test of a well-designed core.</b> At 10 orders/day or 120 orders/day, a new operator handed the checklist and the sheet can execute every step correctly without asking questions. That is the target.</div>
+</section>
+
+<!-- ═══════════════════════ MODE BREAKDOWN ═══ -->
+<section id="mode-view" class="section">
+  <div class="section-eyebrow">Operating Modes</div>
+  <div class="section-title">Mode Breakdown — Select a Volume Mode</div>
+  <hr class="section-rule">
+
+  <div class="mode-row">
+    <button class="mode-btn active-low" id="btn-low" onclick="showMode('low', this)">
+      <span class="mode-btn-label">Low Volume</span>
+      <span class="mode-btn-range">10–20 orders / day</span>
+      <span class="mode-btn-ops">1 operator · 2–3h pack time</span>
+    </button>
+    <button class="mode-btn" id="btn-mid" onclick="showMode('mid', this)">
+      <span class="mode-btn-label">Mid Volume</span>
+      <span class="mode-btn-range">20–60 orders / day</span>
+      <span class="mode-btn-ops">1–2 operators · 4–6h pack time</span>
+    </button>
+    <button class="mode-btn" id="btn-high" onclick="showMode('high', this)">
+      <span class="mode-btn-label">High Volume</span>
+      <span class="mode-btn-range">60–120 orders / day</span>
+      <span class="mode-btn-ops">3–4 operators · full shift</span>
+    </button>
+  </div>
+
+  <!-- LOW -->
+  <div id="panel-low" class="mode-panel active mode-low">
+    <div class="mode-stats">
+      <div class="mode-stat"><div class="mode-stat-val">~15</div><div class="mode-stat-lbl">orders / day</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">1</div><div class="mode-stat-lbl">operator</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">2–3h</div><div class="mode-stat-lbl">pack time / day</div></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-lbl">What works at this volume</div>
+        <div class="detail-item good">Google Sheet handles everything cleanly</div>
+        <div class="detail-item good">1 operator with checklist = fully repeatable</div>
+        <div class="detail-item good">Batch IDs written manually are fine</div>
+        <div class="detail-item good">Visual QA catches errors without a scan system</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-lbl">What to watch</div>
+        <div class="detail-item warn">Sheet discipline — rows must be logged same day</div>
+        <div class="detail-item warn">Label accuracy — no second set of eyes yet</div>
+        <div class="detail-item warn">Eric still in the loop = fragile dependency</div>
+      </div>
+      <div class="detail-box full">
+        <div class="detail-lbl">Not needed yet — do not over-build</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;">
+          <span class="pill pill-all">Barcode scanning</span>
+          <span class="pill pill-all">Second operator</span>
+          <span class="pill pill-all">Shift scheduling</span>
+          <span class="pill pill-all">ShipStation or WMS</span>
+          <span class="pill pill-all">Daily standup</span>
+          <span class="pill pill-all">Team lead role</span>
+        </div>
+      </div>
+    </div>
+    <div class="break-box">
+      <div class="break-lbl">Breaking point</div>
+      <div class="break-text">Leighanna gets sick, takes a day off, or volume spikes without warning. One-person systems have zero redundancy. This is the first fragile point — not a failure of design, a structural limit of solo operation.</div>
+    </div>
+    <div class="trigger-box">
+      <div class="trigger-lbl">Upgrade trigger</div>
+      <div class="trigger-text">When pack time consistently exceeds 3 hours/day OR any single day hits 25+ orders — hire the first packaging associate immediately. Do not wait for a bad week to prove the need.</div>
+    </div>
+  </div>
+
+  <!-- MID -->
+  <div id="panel-mid" class="mode-panel mode-mid">
+    <div class="mode-stats">
+      <div class="mode-stat"><div class="mode-stat-val">~40</div><div class="mode-stat-lbl">orders / day</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">1–2</div><div class="mode-stat-lbl">operators</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">4–6h</div><div class="mode-stat-lbl">pack time / day</div></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-lbl">What gets added at mid volume</div>
+        <div class="detail-item good">Second operator — packaging associate role</div>
+        <div class="detail-item good">Operator column in pack log (who packed what)</div>
+        <div class="detail-item good">Daily open/close log — start of day qty + end of day</div>
+        <div class="detail-item good">Leighanna shifts from packer to QA verifier</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-lbl">What stays identical</div>
+        <div class="detail-item">Same batch ID format — no change</div>
+        <div class="detail-item">Same checklist — used by 2 people, not rewritten</div>
+        <div class="detail-item">Same Google Sheet — add 1 column (Operator)</div>
+        <div class="detail-item">Same 3-step QA gates — 2nd person now executes them</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-lbl">New risks at this volume</div>
+        <div class="detail-item warn">Two operators → inconsistency risk. Checklist must be enforced, not assumed.</div>
+        <div class="detail-item warn">Communication gap if no morning handoff between operators</div>
+        <div class="detail-item warn">Sheet gets messy if both log simultaneously without row assignment</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-lbl">What solves those risks</div>
+        <div class="detail-item good">5-min daily standup — pending, packed, exceptions</div>
+        <div class="detail-item good">Each operator owns a row range (no shared open queue)</div>
+        <div class="detail-item good">Leighanna does end-of-day sheet audit (5 minutes)</div>
+      </div>
+    </div>
+    <div class="break-box">
+      <div class="break-lbl">Breaking point</div>
+      <div class="break-text">The Google Sheet becomes a coordination problem. Two people logging simultaneously creates overwritten rows, missed status changes, and duplicate batch IDs. This is the sheet's natural ceiling — not a flaw, a known limit.</div>
+    </div>
+    <div class="trigger-box">
+      <div class="trigger-lbl">Upgrade trigger</div>
+      <div class="trigger-text">When the sheet produces 3+ errors/week from dual-operator logging OR pack time consistently hits 6h/day with 2 people — evaluate ShipStation. The sheet stays as the verification layer. ShipStation becomes the routing layer on top.</div>
+    </div>
+  </div>
+
+  <!-- HIGH -->
+  <div id="panel-high" class="mode-panel mode-high">
+    <div class="mode-stats">
+      <div class="mode-stat"><div class="mode-stat-val">~90</div><div class="mode-stat-lbl">orders / day</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">3–4</div><div class="mode-stat-lbl">operators</div></div>
+      <div class="mode-stat"><div class="mode-stat-val">full</div><div class="mode-stat-lbl">shift coverage</div></div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-lbl">What gets added at high volume</div>
+        <div class="detail-item good">ShipStation or equivalent for order routing + label print</div>
+        <div class="detail-item good">Team lead role — owns the floor, not Leighanna</div>
+        <div class="detail-item good">Barcode scan at pre-ship QA gate (timestamped record)</div>
+        <div class="detail-item good">Shift-based batch assignments — not an open queue</div>
+        <div class="detail-item good">Printed batch sheets replace verbal handoffs entirely</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-lbl">What stays identical</div>
+        <div class="detail-item">Same batch ID format — just generated faster</div>
+        <div class="detail-item">Same 3-step QA logic — scan replaces visual check</div>
+        <div class="detail-item">Same order→batch→shipment linkage model</div>
+        <div class="detail-item">Leighanna owns ops — now from above, not inside it</div>
+      </div>
+      <div class="detail-box full">
+        <div class="detail-lbl">Critical failure modes at this volume — all preventable</div>
+        <div class="detail-item bad">Label printer down = full stop. Backup printer or pre-printed sheets required.</div>
+        <div class="detail-item bad">One operator skipping QA gates contaminates the entire batch.</div>
+        <div class="detail-item bad">No team lead = Leighanna back in the weeds. Kills Eric's operational freedom.</div>
+        <div class="detail-item bad">Shipment mis-sorts at this volume = expensive carrier reroutes and customer complaints.</div>
+      </div>
+    </div>
+    <div class="break-box">
+      <div class="break-lbl">Breaking point</div>
+      <div class="break-text">At 90+ orders/day, verbal coordination and manual sheet logging fully collapse. Three operators cannot be coordinated through a shared spreadsheet. This is where the system needs a routing layer and QA must be enforced by scan — not trust.</div>
+    </div>
+    <div class="trigger-box">
+      <div class="trigger-lbl">Mandatory upgrade trigger</div>
+      <div class="trigger-text">When you hire operator #3 — that is the non-negotiable trigger. ShipStation and barcode scan must be live before operator #3 starts day one. This is not a preference. Three-person QA cannot be managed on trust at this volume.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FLEX TABLE ═══ -->
+<section id="flex-table" class="section">
+  <div class="section-eyebrow">Layer Comparison</div>
+  <div class="section-title">What Flexes — Layer by Layer</div>
+  <hr class="section-rule">
+
+  <div class="callout callout-blue" style="margin-bottom:24px;"><b>Reading this table.</b> Gray pills = present at all modes unchanged. Green = introduced at low. Amber = introduced at mid. Red = introduced at high. Nothing marked red replaces something marked green — it adds on top of it.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">Layer</th>
+          <th style="width:27%">Low (10–20/day)</th>
+          <th style="width:27%">Mid (20–60/day)</th>
+          <th style="width:28%">High (60–120/day)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-name">Order tracking</td>
+          <td><span class="pill pill-low">Google Sheet</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Manual entry, same-day logging</span></td>
+          <td><span class="pill pill-mid">Sheet + daily audit</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna audits at close</span></td>
+          <td><span class="pill pill-high">ShipStation routes</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Sheet is verification backup</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Batch log</td>
+          <td><span class="pill pill-low">1 row per batch</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna logs everything</span></td>
+          <td><span class="pill pill-mid">Operator column added</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Who packed what, trackable</span></td>
+          <td><span class="pill pill-high">Printed batch sheets</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Team lead owns log per shift</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">QA verification</td>
+          <td><span class="pill pill-low">Visual 3-gate check</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna runs all gates</span></td>
+          <td><span class="pill pill-mid">Operator + spot check</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna spot-checks 2nd operator</span></td>
+          <td><span class="pill pill-high">Scan at pre-ship gate</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Team lead random audits</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Labeling</td>
+          <td><span class="pill pill-low">Printed or handwritten</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Applied individually per order</span></td>
+          <td><span class="pill pill-mid">Batch-generated labels</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Printed at start of day</span></td>
+          <td><span class="pill pill-high">ShipStation prints labels</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Batch ID embedded in barcode</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Staffing model</td>
+          <td><span class="pill pill-low">Leighanna does all roles</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Packer + QA + logger</span></td>
+          <td><span class="pill pill-mid">Associate packs</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna QAs + manages</span></td>
+          <td><span class="pill pill-high">Team lead manages floor</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna manages team lead</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Communication</td>
+          <td><span class="pill pill-low">None needed</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Solo operator — no coordination overhead</span></td>
+          <td><span class="pill pill-mid">5-min daily standup</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">End-of-day sheet audit</span></td>
+          <td><span class="pill pill-high">Printed shift briefs</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Team lead → Leighanna daily handoff</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Error recovery</td>
+          <td><span class="pill pill-low">Same-day catch</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Leighanna catches and fixes</span></td>
+          <td><span class="pill pill-mid">Within 24h audit</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Daily audit catches errors</span></td>
+          <td><span class="pill pill-high">Gate-flagged real time</span><br><span style="font-size:11px;color:var(--text-3);margin-top:4px;display:block;">Team lead resolves before EOD</span></td>
+        </tr>
+        <tr>
+          <td class="col-name">Leighanna's role</td>
+          <td><span style="font-size:12px;font-weight:500;color:var(--green-text);">Doing the work</span></td>
+          <td><span style="font-size:12px;font-weight:500;color:var(--amber-text);">Managing + doing</span></td>
+          <td><span style="font-size:12px;font-weight:500;color:var(--red-text);">Managing only</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-purple"><b>The trajectory.</b> Leighanna moves out of the pack flow — not because she isn't capable, but because her highest-value work is oversight, quality, and management. The system is designed so this transition happens naturally as volume grows.</div>
+</section>
+
+<!-- ═══════════════════════ BREAK POINTS ═══ -->
+<section id="break-points" class="section">
+  <div class="section-eyebrow">Risk Architecture</div>
+  <div class="section-title">The Three Break Points</div>
+  <hr class="section-rule">
+
+  <p style="font-size:13px;color:var(--text-2);line-height:1.7;max-width:700px;margin-bottom:24px;">Every system has predictable failure modes. These three are structural — they occur at specific thresholds regardless of how well the team executes. Design around them before hitting them, not after.</p>
+
+  <div class="bp-card">
+    <div class="bp-header">
+      <div class="bp-num">1</div>
+      <div class="bp-name">Single-operator ceiling</div>
+      <span class="bp-trigger">Hits at ~25 orders/day</span>
+    </div>
+    <div class="bp-desc">One person doing packing + QA + logging + managing exceptions + communicating with Eric is a 4-hat job. It works at 15 orders/day. It collapses at 25. The fix is not working faster — it is adding an operator and separating roles. This is not a performance problem; it is a structural limit.</div>
+    <div class="bp-grid">
+      <div class="bp-box symptom">
+        <div class="bp-box-lbl">Symptom</div>
+        <div class="bp-box-text">Pack time consistently over 3h/day. Leighanna is still thinking about open orders after hours.</div>
+      </div>
+      <div class="bp-box fix">
+        <div class="bp-box-lbl">Fix</div>
+        <div class="bp-box-text">Hire packaging associate. Leighanna moves to QA + oversight immediately — not gradually.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bp-card">
+    <div class="bp-header">
+      <div class="bp-num">2</div>
+      <div class="bp-name">Google Sheet coordination ceiling</div>
+      <span class="bp-trigger">Hits at 2 operators + ~50/day</span>
+    </div>
+    <div class="bp-desc">Two people simultaneously updating one Google Sheet creates race conditions — overwritten rows, missed status changes, duplicate batch IDs. The Sheet was designed for one brain. At two operators it needs rules. At three operators it needs a dedicated routing tool. This is the Sheet's designed limit, not a flaw.</div>
+    <div class="bp-grid">
+      <div class="bp-box symptom">
+        <div class="bp-box-lbl">Symptom</div>
+        <div class="bp-box-text">Sheet errors appearing 3+ times per week. Operators asking "did you log that?" regularly.</div>
+      </div>
+      <div class="bp-box fix">
+        <div class="bp-box-lbl">Fix</div>
+        <div class="bp-box-text">Add ShipStation as order router. Sheet becomes verification layer — not the primary entry point.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bp-card">
+    <div class="bp-header">
+      <div class="bp-num">3</div>
+      <div class="bp-name">Manual QA ceiling</div>
+      <span class="bp-trigger">Hits at 3 operators + ~80/day</span>
+    </div>
+    <div class="bp-desc">Visual QA works when one person can hold the entire order set in their head. At 80+ orders/day across 3 operators, no human can audit everything visually. One operator skipping a QA gate becomes undetectable without a scan record. This is where a mislabeled shipment reaches a customer — not because someone made a mistake, but because the system had no enforcement mechanism.</div>
+    <div class="bp-grid">
+      <div class="bp-box symptom">
+        <div class="bp-box-lbl">Symptom</div>
+        <div class="bp-box-text">First customer complaint about wrong product or missing item. Or Leighanna cannot confirm whether a specific order was QA-checked.</div>
+      </div>
+      <div class="bp-box fix">
+        <div class="bp-box-lbl">Fix</div>
+        <div class="bp-box-text">Barcode scan at the pre-ship gate. Scan creates a timestamped record. QA becomes auditable — not trust-based.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber"><b>The rule on upgrade triggers.</b> These are thresholds, not suggestions. When the symptom appears — not before, not long after — execute the fix. Early upgrades add cost and complexity before the need exists. Late upgrades cause customer-facing failures. Hit the trigger, then move.</div>
+
+  <div style="margin-top:28px;">
+    <div class="section-eyebrow">Upgrade Summary</div>
+    <div class="section-title">When to Evolve the System</div>
+    <hr class="section-rule">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:20%">Break point</th>
+            <th style="width:30%">Trigger condition</th>
+            <th style="width:25%">Action required</th>
+            <th style="width:25%">What stays the same</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-name">Single operator</td>
+            <td>Pack time &gt;3h/day consistently <br><span style="font-size:11px;color:var(--text-3)">OR any day hits 25+ orders</span></td>
+            <td>Hire packaging associate immediately</td>
+            <td>Checklist, batch ID, QA gates, sheet</td>
+          </tr>
+          <tr>
+            <td class="col-name">Sheet coordination</td>
+            <td>3+ sheet errors/week from dual logging <br><span style="font-size:11px;color:var(--text-3)">OR 6h pack time with 2 people</span></td>
+            <td>Add ShipStation as routing layer</td>
+            <td>Batch ID format, 3-gate QA logic, linkage model</td>
+          </tr>
+          <tr>
+            <td class="col-name">Manual QA</td>
+            <td>Operator #3 start date <br><span style="font-size:11px;color:var(--text-3)">— non-negotiable, must be live before day 1</span></td>
+            <td>Barcode scan at pre-ship gate; team lead hired</td>
+            <td>Batch ID format, checklist steps, QA checkpoint structure</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Hritsko Volume-Mode Architecture · v1.0 · Internal Use Only</span>
+  <span>March 2026</span>
+</footer>
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showMode(mode, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.remove('active-low', 'active-mid', 'active-high');
+  });
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active-' + mode);
+  document.getElementById('panel-' + mode).classList.add('active');
+}
+</script>
+</body>
+</html>
