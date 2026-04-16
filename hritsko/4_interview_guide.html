@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Guide — Hritsko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; background: #f5f4f0; color: #1a1a1a; padding-bottom: 80px; }
+  .banner { background: #0c0c0c; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; }
+  .banner img { height: 28px; }
+  .banner-meta { text-align: right; }
+  .banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .08em; }
+  .banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; display: block; }
+  .nav { background: #fff; border-bottom: 1px solid #e2e1dc; position: sticky; top: 64px; z-index: 99; display: flex; padding: 0 28px; }
+  .nav-tab { font-size: 13px; font-weight: 500; color: #8a8a85; padding: 14px 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+  .nav-tab:hover { color: #1a1a1a; }
+  .nav-tab.active { color: #1a1a1a; border-bottom-color: #0c0c0c; }
+  .tab-content { display: none; max-width: 900px; margin: 0 auto; padding: 36px 28px; }
+  .tab-content.active { display: block; }
+  .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #b8b7b2; margin-bottom: 6px; }
+  .section-title { font-size: 16px; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #e2e1dc; margin-bottom: 20px; }
+  .card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 14px; }
+  .callout-green { border-color: #25a05e; background: #eaf5f0; color: #1a6e42; }
+  .callout-blue { border-color: #2e6cc4; background: #eaf0f9; color: #1a4f8a; }
+  .callout-amber { border-color: #c8880e; background: #fdf5e6; color: #7a4d08; }
+  .callout-red { border-color: #cc3333; background: #fdf0f0; color: #8a1f1f; }
+  .callout-purple { border-color: #6e48c0; background: #f2eefb; color: #4a2880; }
+  .callout strong { display: block; margin-bottom: 3px; }
+  .table-wrap { border: 1px solid #e2e1dc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { background: #0c0c0c; }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); padding: 11px 14px; text-align: left; letter-spacing: .06em; text-transform: uppercase; font-weight: 400; }
+  tbody tr { border-bottom: 1px solid #e2e1dc; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f5f4f0; }
+  tbody td { padding: 12px 14px; font-size: 13px; color: #4a4948; vertical-align: top; }
+  td.key { font-weight: 500; color: #1a1a1a; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; border: 1px solid; }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge-green { color: #1a6e42; background: #eaf5f0; border-color: #a8dcc0; } .badge-green::before { background: #25a05e; }
+  .badge-amber { color: #7a4d08; background: #fdf5e6; border-color: #f0d080; } .badge-amber::before { background: #c8880e; }
+  .badge-red { color: #8a1f1f; background: #fdf0f0; border-color: #f0aaaa; } .badge-red::before { background: #cc3333; }
+
+  /* QUESTION CARDS */
+  .q-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; margin-bottom: 18px; overflow: hidden; }
+  .q-header { background: #0c0c0c; padding: 14px 20px; display: flex; align-items: baseline; gap: 12px; }
+  .q-num { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+  .q-text { font-size: 14px; font-weight: 600; color: #fff; }
+  .q-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .q-col { padding: 16px 18px; }
+  .q-col-green { background: #eaf5f0; border-right: 1px solid #e2e1dc; }
+  .q-col-red { background: #fdf0f0; }
+  .q-col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+  .q-col-green .q-col-label { color: #25a05e; }
+  .q-col-red .q-col-label { color: #cc3333; }
+  .q-col p { font-size: 13px; line-height: 1.55; }
+  .q-col-green p { color: #1a6e42; }
+  .q-col-red p { color: #8a1f1f; }
+  .q-notes { border-top: 1px solid #e2e1dc; padding: 12px 18px; background: #fafaf8; display: flex; align-items: center; gap: 10px; }
+  .q-notes-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; text-transform: uppercase; letter-spacing: .1em; flex-shrink: 0; }
+  .q-notes input { flex: 1; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 13px; color: #1a1a1a; outline: none; }
+
+  /* PHONE SCREEN */
+  .check-list { list-style: none; }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0efea; cursor: pointer; }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 18px; height: 18px; border: 1.5px solid #d0cfca; border-radius: 4px; flex-shrink: 0; margin-top: 1px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .check-box.checked { background: #0c0c0c; border-color: #0c0c0c; }
+  .check-box.checked::after { content: '✓'; color: #fff; font-size: 11px; }
+  .check-label strong { display: block; font-size: 13px; font-weight: 500; }
+  .check-label span { font-size: 12px; color: #8a8a85; }
+
+  /* WORKFLOW STEPS */
+  .step-list { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .step-item { display: flex; border-bottom: 1px solid #f0efea; }
+  .step-item:last-child { border-bottom: none; }
+  .step-num { background: #f5f4f0; width: 52px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; color: #8a8a85; flex-shrink: 0; }
+  .step-body { padding: 14px 16px; flex: 1; }
+  .step-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+  .step-desc { font-size: 13px; color: #4a4948; }
+  .gate { display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 4px 10px; border: 1px solid; margin-top: 8px; }
+  .gate-amber { color: #7a4d08; background: #fdf5e6; border-color: #f0d080; }
+  .gate-green { color: #1a6e42; background: #eaf5f0; border-color: #a8dcc0; }
+
+  .footer { background: #0c0c0c; position: fixed; bottom: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+  .footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.25); }
+  @media print { .nav, .footer { display: none; } .banner { position: relative; } .tab-content { display: block !important; padding-top: 16px; } body { padding-bottom: 0; } }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <img src="data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-meta">
+    <span class="banner-title">INTERVIEW GUIDE</span>
+    <span class="banner-version">v1.0 · Internal Use Only</span>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('phone', this)">Phone Screen</div>
+  <div class="nav-tab" onclick="showTab('questions', this)">6 Questions</div>
+  <div class="nav-tab" onclick="showTab('wrapup', this)">Wrap-Up</div>
+</div>
+
+<!-- PHONE SCREEN -->
+<div class="tab-content active" id="tab-phone">
+
+  <div class="section-label">Before You Meet</div>
+  <div class="section-title">Phone Screen Checklist</div>
+
+  <div class="callout callout-amber">
+    <strong>Do this before any in-person interview.</strong>
+    If any of these fail, don't schedule a meeting. You're screening for real availability and basic fit — not character.
+  </div>
+
+  <div class="card">
+    <ul class="check-list" id="phone-checks">
+      <li class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Fewer than 2 jobs in the last 12 months — or gaps are explained</strong><span>Ask directly: "Can you walk me through your last year or two of work?" Listen for honesty and continuity.</span></div>
+      </li>
+      <li class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Can start within 1 week</strong><span>For Hire 1, timing matters. Ask: "If this is a fit, how soon could you start?"</span></div>
+      </li>
+      <li class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Availability confirmed for fixed shift — no conditions</strong><span>State the exact schedule. Ask if there's anything that would prevent them from being there consistently.</span></div>
+      </li>
+      <li class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="check-label"><strong>Transportation is specific and reliable</strong><span>Ask: "How would you be getting here each day?" Vague answers = a real risk.</span></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="callout callout-blue" style="margin-top:4px">
+    <strong>The phone screen takes 5–7 minutes.</strong>
+    You're not selling the role yet — you're filtering. If all four pass, schedule the in-person and move to the Questions tab.
+  </div>
+
+  <div class="section-label" style="margin-top:28px">Structure</div>
+  <div class="section-title">How the Interview Should Flow</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-title">Welcome + set context (2 min)</div>
+        <div class="step-desc">Briefly describe the role and what a typical day looks like. Don't oversell. Be direct about pace and repetition — you want someone who wants that.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-title">Run the 6 questions (15–18 min)</div>
+        <div class="step-desc">Ask every question in order. Don't skip. Take notes on the scorecard while they answer — details fade after the conversation.</div>
+        <div class="gate gate-amber">Do not skip questions to speed up the interview</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-title">Wrap-up questions + close (5 min)</div>
+        <div class="step-desc">Give them space to ask questions. Tell them when they'll hear back — and follow through on that timeline.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <div class="step-title">Score within 30 minutes</div>
+        <div class="step-desc">Complete the scorecard immediately after. Make the hire/pass/second-interview call the same day.</div>
+        <div class="gate gate-green">Complete before your next task</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- QUESTIONS -->
+<div class="tab-content" id="tab-questions">
+
+  <div class="section-label">In-Person Interview</div>
+  <div class="section-title">6 Questions — Ask Every One, In Order</div>
+  <p style="font-size:13px;color:#4a4948;margin-bottom:24px;">Left column = what a strong answer looks like. Right column = what to watch for. Take notes on the scorecard as you go.</p>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q1</span><span class="q-text">Walk me through a typical day at your last job.</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Specific. Sequential. Describes what "done" looks like. Shows comfort with structured, repetitive work without complaining about it.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Vague. Jumps around. Complains about management or coworkers unprompted. Can't describe a normal day in concrete terms.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q2</span><span class="q-text">Tell me about a time you caught a mistake before it became a problem.</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Specific example. Took ownership. Fixed it or flagged it immediately. Doesn't require follow-up prompting to get details.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Can't think of one. Blames someone else for the situation. Describes a case where they let it go or hid it.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q3</span><span class="q-text">How do you handle it when the pace picks up and things get busy?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Describes a method or personal system. Stays calm in the description. Says they don't skip steps to go faster.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>"I just work harder." No specifics. Or visibly flustered just describing a busy scenario — that's a preview of on-floor behavior.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q4</span><span class="q-text">If you realized mid-shift you'd been doing something the wrong way, what would you do?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Stops immediately. Flags it. Asks for correction. Doesn't try to self-fix silently or finish out the task first.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Finishes the task anyway. Hides it. "I'd just keep going and mention it later." These are the errors that compound.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q5</span><span class="q-text">What's the longest you've held a job, and why did you leave?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>1+ year. Left voluntarily for a growth, pay, or personal reason. Talks about it plainly without over-explaining or hedging.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Fired. Multiple short stints. Vague or evasive about the reason. Gets defensive when you ask a natural follow-up.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><span class="q-num">Q6</span><span class="q-text">Is there anything that would prevent you from being here reliably Monday through [day]?</span></div>
+    <div class="q-body">
+      <div class="q-col q-col-green"><div class="q-col-label">✓ Strong Answer</div><p>Clear and direct. No hesitation. Confirms availability without conditions or "it depends on…" qualifiers.</p></div>
+      <div class="q-col q-col-red"><div class="q-col-label">✕ Red Flag</div><p>Hesitation. "It depends." Conditions, caveats, or a vague "I'll figure it out." Reliability issues surface here first.</p></div>
+    </div>
+    <div class="q-notes"><span class="q-notes-label">Notes</span><input type="text" placeholder="What they said…"></div>
+  </div>
+
+</div>
+
+<!-- WRAP-UP -->
+<div class="tab-content" id="tab-wrapup">
+
+  <div class="section-label">Close the Interview</div>
+  <div class="section-title">Wrap-Up Questions — Ask Every Time</div>
+  <p style="font-size:13px;color:#4a4948;margin-bottom:20px;">These three questions close the interview and reveal things the structured questions won't. Don't skip them.</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-weight:600;font-size:14px;margin-bottom:6px">"Do you have any questions for me about the role or how we work?"</div>
+    <p style="font-size:13px;color:#4a4948;margin-bottom:10px;">Curious candidates ask something. Indifferent ones don't. What they ask tells you what they're actually thinking about.</p>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Their Questions / Notes</div>
+    <textarea style="width:100%;border:1px solid #e2e1dc;border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;background:#fafaf8;outline:none;resize:none;" rows="2" placeholder="What they asked…"></textarea>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-weight:600;font-size:14px;margin-bottom:6px">"What would make this a great fit for you?"</div>
+    <p style="font-size:13px;color:#4a4948;margin-bottom:10px;">Reveals alignment. Red flag if they can't answer or list things you clearly can't deliver. Green flag if they describe what the role actually offers.</p>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Notes</div>
+    <textarea style="width:100%;border:1px solid #e2e1dc;border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;background:#fafaf8;outline:none;resize:none;" rows="2" placeholder="Their answer…"></textarea>
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="font-weight:600;font-size:14px;margin-bottom:6px">"When can you start?"</div>
+    <p style="font-size:13px;color:#4a4948;margin-bottom:10px;">A direct availability test. Hesitation here after they already confirmed availability on the phone = inconsistency worth noting.</p>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Their Answer</div>
+    <textarea style="width:100%;border:1px solid #e2e1dc;border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;background:#fafaf8;outline:none;resize:none;" rows="2" placeholder="Date / timeline they gave…"></textarea>
+  </div>
+
+  <div class="section-label">After the Interview</div>
+  <div class="section-title">Closing Checklist</div>
+
+  <div class="card">
+    <ul class="check-list">
+      <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Tell them when they'll hear back — and give a specific timeframe</strong><span>Vague "we'll be in touch" erodes candidate trust. Say a day: "You'll hear from me by [day]."</span></div></li>
+      <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Complete the scorecard within 30 minutes of the interview ending</strong><span>Details fade fast. Score while it's fresh.</span></div></li>
+      <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>File the completed scorecard in /Candidates/ folder</strong><span>One file per candidate. Name it: YYYY-MM-DD_[LastName].pdf or .html</span></div></li>
+      <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label"><strong>Follow through on the timeline you gave them</strong><span>Even a "not moving forward" response keeps your reputation intact for future hiring.</span></div></li>
+    </ul>
+  </div>
+
+  <div class="callout callout-purple" style="margin-top:8px">
+    <strong>The hiring decision should be made the same day.</strong>
+    Delaying doesn't improve the decision — it just creates uncertainty and costs you good candidates to faster employers.
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>Hritsko Interview Guide · v1.0 · Internal Use Only</span>
+  <span id="footer-date"></span>
+</div>
+
+<script>
+  document.querySelector('.banner img').src = 'data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==';
+  function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+  function toggleCheck(item) {
+    item.querySelector('.check-box').classList.toggle('checked');
+  }
+  document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+</script>
+</body>
+</html>
