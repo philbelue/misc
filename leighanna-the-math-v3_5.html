@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Math — For Leighanna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --linen: #f5f1eb;
+    --linen-warm: #ede8e0;
+    --cream: #faf8f4;
+    --card: #ffffff;
+    --sage: #7a8e7a;
+    --sage-light: #e8ede8;
+    --sage-deep: #5c6e5c;
+    --dusty-blue: #8fa4b5;
+    --dusty-blue-light: #e8eff4;
+    --dusty-blue-deep: #5d7a8f;
+    --gold: #b89b6a;
+    --gold-light: #f5edd8;
+    --gold-warm: #a08550;
+    --blush: #d4a89a;
+    --blush-light: #f7ece8;
+    --rose-muted: #c4918a;
+    --text: #3d3830;
+    --text-soft: #6b635a;
+    --text-muted: #9e968c;
+    --border: #e5dfd6;
+    --border-light: #ede8e0;
+    --radius: 14px;
+    --shadow: 0 2px 20px rgba(61,56,48,0.06);
+  }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 15px; line-height: 1.7;
+    color: var(--text);
+    background: var(--linen);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(165deg, #f0ebe3 0%, #e8e2d8 40%, #ddd8ce 100%);
+    padding: 48px 28px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(184,155,106,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%; left: -15%;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(143,164,181,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header-tag {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 14px;
+    position: relative;
+  }
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px; font-weight: 500;
+    color: var(--text);
+    line-height: 1.2; margin-bottom: 10px;
+    position: relative;
+  }
+  .header p {
+    font-size: 14px; color: var(--text-muted);
+    position: relative;
+  }
+
+  /* ── DEDICATION ── */
+  .dedication {
+    background: linear-gradient(165deg, #f0ebe3 0%, #e8e2d8 40%, #ddd8ce 100%);
+    padding: 0 28px 44px;
+    text-align: center;
+    position: relative;
+  }
+  .ded-for {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .ded-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 500;
+    color: var(--text);
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+  .ded-by {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .ded-by em {
+    color: var(--text-soft);
+    font-style: italic;
+  }
+
+  /* ── DECORATIVE DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 0;
+  }
+  .divider-line {
+    width: 40px; height: 1px;
+    background: var(--border);
+  }
+  .divider-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 8px 22px 20px;
+  }
+
+  /* ── COMPARE CARDS ── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .compare-card {
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .compare-card.you {
+    background: var(--blush-light);
+    border: 1px solid rgba(212,168,154,0.3);
+  }
+  .compare-card.market {
+    background: var(--sage-light);
+    border: 1px solid rgba(122,142,122,0.25);
+  }
+  .compare-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .compare-card.you .compare-label { color: var(--rose-muted); }
+  .compare-card.market .compare-label { color: var(--sage-deep); }
+  .compare-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+  .compare-sub {
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  /* ── FACT CARDS ── */
+  .fact {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .fact-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold-warm); margin-bottom: 6px;
+  }
+  .fact p {
+    font-size: 14px; color: var(--text-soft);
+    line-height: 1.7;
+  }
+  .fact strong { color: var(--text); }
+
+  /* ── ACCENT BLOCKS ── */
+  .accent-block {
+    border-radius: var(--radius);
+    padding: 32px 26px;
+    text-align: center;
+    margin: 22px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .accent-block.sage {
+    background: linear-gradient(145deg, var(--sage) 0%, var(--sage-deep) 100%);
+    color: #fff;
+  }
+  .accent-block.dusty {
+    background: linear-gradient(145deg, var(--dusty-blue) 0%, var(--dusty-blue-deep) 100%);
+    color: #fff;
+  }
+  .accent-block.warm {
+    background: linear-gradient(145deg, #bba07a 0%, #a08550 100%);
+    color: #fff;
+  }
+  .accent-block::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -30%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .accent-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    opacity: 0.7; margin-bottom: 8px;
+    position: relative;
+  }
+  .accent-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px; font-weight: 600;
+    margin-bottom: 6px;
+    position: relative;
+    line-height: 1;
+  }
+  .accent-sub {
+    font-size: 13px; opacity: 0.7;
+    line-height: 1.6;
+    position: relative;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* ── BOTTOM ── */
+  .bottom {
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .bottom p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; font-weight: 400;
+    color: var(--text-soft);
+    line-height: 1.6;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+  .bottom p strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    background: var(--linen-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .quote-block::before {
+    content: '\201C';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 60px;
+    color: var(--gold);
+    opacity: 0.2;
+    position: absolute;
+    top: 4px; left: 18px;
+    line-height: 1;
+  }
+  .quote-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--text-soft);
+    line-height: 1.6;
+    max-width: 340px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── LILY DIVIDER ── */
+  .lily-divider {
+    text-align: center;
+    padding: 16px 0;
+    font-size: 18px;
+    color: var(--gold);
+    opacity: 0.3;
+    letter-spacing: 12px;
+  }
+
+  /* ═══════════════════════════════════════════
+     CHITTY CHAT SECTION
+  ═══════════════════════════════════════════ */
+  .chitty-section {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 22px 56px;
+  }
+
+  .chitty-header {
+    text-align: center;
+    padding: 12px 0 24px;
+  }
+  .chitty-tag {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--dusty-blue-deep);
+    margin-bottom: 8px;
+  }
+  .chitty-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 500;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .chitty-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* VOICE MEMO STEPS */
+  .vm-steps {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .vm-steps-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 600;
+    color: var(--text);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .vm-step {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    align-items: flex-start;
+  }
+  .vm-step:last-child { border-bottom: none; }
+  .vm-num {
+    width: 30px; height: 30px; flex-shrink: 0;
+    background: var(--dusty-blue-light);
+    color: var(--dusty-blue-deep);
+    font-weight: 700; font-size: 13px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vm-text {
+    font-size: 14px;
+    color: var(--text-soft);
+    line-height: 1.6;
+    padding-top: 4px;
+  }
+  .vm-text strong { color: var(--text); }
+
+  /* RULES CARD */
+  .rules-card {
+    background: var(--sage-light);
+    border: 1px solid rgba(122,142,122,0.2);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .rules-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 600;
+    color: var(--sage-deep);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .rules-list {
+    list-style: none;
+  }
+  .rules-list li {
+    font-size: 14px;
+    color: var(--text-soft);
+    padding: 6px 0;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .rules-list li::before {
+    content: '✿';
+    position: absolute;
+    left: 0;
+    color: var(--sage);
+    font-size: 11px;
+    top: 8px;
+  }
+
+  /* QUESTION DROPDOWNS */
+  .q-intro {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .q-drop {
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 10px rgba(61,56,48,0.04);
+    transition: box-shadow 0.2s;
+  }
+  .q-drop.open {
+    box-shadow: 0 2px 20px rgba(61,56,48,0.08);
+  }
+  .q-drop-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .q-drop-header:hover,
+  .q-drop-header:active {
+    background: var(--cream);
+  }
+  .q-drop-num {
+    width: 28px; height: 28px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    transition: all 0.2s;
+  }
+  .q-drop:nth-child(odd) .q-drop-num {
+    background: var(--dusty-blue-light); color: var(--dusty-blue-deep);
+  }
+  .q-drop:nth-child(even) .q-drop-num {
+    background: var(--sage-light); color: var(--sage-deep);
+  }
+  .q-drop-question {
+    font-size: 14px; font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.4;
+  }
+  .q-drop-arrow {
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .q-drop.open .q-drop-arrow {
+    transform: rotate(180deg);
+  }
+  .q-drop-body {
+    display: none;
+    padding: 0 20px 18px;
+    padding-left: 60px;
+  }
+  .q-drop.open .q-drop-body {
+    display: block;
+  }
+  .q-drop-hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* SEND IT CARD */
+  .send-card {
+    background: linear-gradient(145deg, var(--dusty-blue) 0%, var(--dusty-blue-deep) 100%);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    color: #fff;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .send-card::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .send-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 500;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .send-card p {
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 1.6;
+    position: relative;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .source {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 24px;
+    padding-bottom: 24px;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 400px) {
+    .header h1 { font-size: 28px; }
+    .compare-num { font-size: 30px; }
+    .accent-num { font-size: 36px; }
+    .content { padding: 8px 16px 20px; }
+    .chitty-section { padding: 0 16px 48px; }
+    .q-drop-body { padding-left: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HEADER + DEDICATION
+═══════════════════════════════════════ -->
+<div class="header">
+  <div class="header-tag">Just the Math</div>
+  <h1>You're Worth More<br>Than You Think</h1>
+  <p>Charlotte market data · April 2026</p>
+</div>
+
+<div class="dedication">
+  <div class="divider" style="padding-top: 24px; padding-bottom: 20px;">
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+    <div class="divider-line"></div>
+  </div>
+  <div class="ded-for">Prepared for</div>
+  <div class="ded-name">Leighanna Margaret Aguililla</div>
+  <div class="ded-by">
+    <em>Prepared by your biggest fan —<br>
+    the one who sees the best in you<br>
+    and believes the most in you.</em>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     THE MATH
+═══════════════════════════════════════ -->
+<div class="content">
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="compare">
+    <div class="compare-card you">
+      <div class="compare-label">You Right Now</div>
+      <div class="compare-num">$67K</div>
+      <div class="compare-sub">Bank of America · Band 5</div>
+    </div>
+    <div class="compare-card market">
+      <div class="compare-label">Market Rate</div>
+      <div class="compare-num">$95K</div>
+      <div class="compare-sub">Same role · Charlotte</div>
+    </div>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">Here's the thing</div>
+    <p>A <strong>Treasury Analyst</strong> — a role <strong>junior to yours</strong> — starts at $67K in Charlotte and goes up to $97K. You're making the starting salary of someone a level below you.</p>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">What your title actually pays</div>
+    <p><strong>Treasury Implementation Specialist:</strong> $70–$115K<br>
+    <strong>Implementation Manager:</strong> $110–$157K<br><br>
+    Your $67K isn't just low. It's below the published range entirely.</p>
+  </div>
+
+  <div class="accent-block sage">
+    <div class="accent-label">Every Year at $67K Instead of $95K</div>
+    <div class="accent-num">−$29,000</div>
+    <div class="accent-sub">In base pay alone. Plus lower 401(k) match, lower bonuses, lower future raises — all compounding off a smaller number.</div>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">What this is actually about</div>
+    <p>At $95–100K you can <strong>drop Legion</strong>. Same take-home or better. Keep your two WFH days. Actually have energy when you get home. <strong>One move eliminates the gap that two jobs currently can't close.</strong></p>
+  </div>
+
+  <!-- PAYCHECK MATH -->
+  <div style="background: var(--card); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 26px 24px; margin-bottom: 14px; box-shadow: var(--shadow);">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--sage-deep); margin-bottom: 14px; text-align: center;">The Paycheck — What Actually Hits Your Account</div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+      <div style="background: var(--blush-light); border-radius: 10px; padding: 16px; text-align: center;">
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--rose-muted); margin-bottom: 4px;">Now · Bi-Weekly</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--text);">$2,045</div>
+        <div style="font-size: 11px; color: var(--text-muted);">$4,431/month</div>
+      </div>
+      <div style="background: var(--sage-light); border-radius: 10px; padding: 16px; text-align: center;">
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sage-deep); margin-bottom: 4px;">At $95K · Bi-Weekly</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--text);">$2,757</div>
+        <div style="font-size: 11px; color: var(--text-muted);">$5,973/month</div>
+      </div>
+    </div>
+
+    <div style="background: var(--gold-light); border-radius: 10px; padding: 18px; text-align: center;">
+      <div style="font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-warm); margin-bottom: 6px;">The Difference — In Your Pocket</div>
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600; color: var(--text); margin-bottom: 2px;">+$712</div>
+      <div style="font-size: 13px; color: var(--text-soft);">more per paycheck</div>
+      <div style="font-size: 13px; color: var(--text-soft); margin-top: 4px;"><strong>+$1,542 more per month</strong></div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Plus two months a year with 3 paychecks instead of 2</div>
+    </div>
+
+    <div style="margin-top: 16px; font-size: 13px; color: var(--text-soft); text-align: center; line-height: 1.7;">
+      That extra $1,542/month is more than Legion pays you. <strong>You could drop the bartending and still take home more than you do right now working both jobs.</strong>
+    </div>
+  </div>
+
+  <div class="lily-divider">✿ ✿ ✿</div>
+
+  <div class="fact">
+    <div class="fact-label">It's not you — it's the system</div>
+    <p>BofA's internal band compression is well-documented. They'll bring someone from <em>outside</em> at $95K for the same role they'd promote you into at $78K. <strong>The system is designed to underpay people who stay.</strong> That's not about your performance — it's about how internal pay bands work at every large bank.</p>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">Right now in Charlotte</div>
+    <p>Wells Fargo, JPMorgan, Truist, Ally, Huntington, First Horizon, U.S. Bank, HomeTrust, Credit Karma, AvidXchange — <strong>all posting treasury and implementation roles right now.</strong> Charlotte is the #2 banking city in America. There is year-round demand for exactly what you do.</p>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">Someone already did this</div>
+    <p>An Implementation Officer at BofA Charlotte — same title, same team type — left and went to AvidXchange. Within 4 years she was promoted three times to Strategic Implementation Project Manager. <strong>Same starting point. Same city. She just made the move.</strong></p>
+  </div>
+
+  <div class="accent-block dusty">
+    <div class="accent-label">Two Years of Staying</div>
+    <div class="accent-num">−$60–80K</div>
+    <div class="accent-sub">In cumulative lost earnings. That's not including the compounding effect on every raise, bonus, and match from here forward.</div>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">You said something important</div>
+    <p><em>"I have been thinking of going to other banks. I'm just comfortable here."</em><br><br>
+    Comfortable and underpaid by $28K are not the same thing. You can find somewhere that feels just as good <strong>and</strong> pays you what you're actually worth — and you'd never have to pick up another bartending shift to make rent. Those places exist. They're hiring. Right now.</p>
+  </div>
+
+  <div class="accent-block warm">
+    <div class="accent-label">What It Takes to Fix This</div>
+    <div class="accent-num" style="font-size: 32px;">Nothing Yet</div>
+    <div class="accent-sub">Phil's building everything. When it's ready, you copy and paste. That's the whole plan. You don't have to figure anything out.</div>
+  </div>
+
+  <!-- CONFIDENCE / REAL TALK SECTION -->
+  <div class="fact" style="border-top: 3px solid var(--sage); margin-top: 22px;">
+    <div class="fact-label">The honest read — no hype</div>
+    <p>These numbers are being <strong>as conservative as possible.</strong> $95K is not a stretch target — it's actually <em>below</em> the market midpoint for your title and experience. Here's what's real:</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 24px; margin-bottom: 14px; box-shadow: var(--shadow);">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--sage-deep); margin-bottom: 14px; text-align: center;">Confidence Level</div>
+
+    <!-- bar 1 -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">$85–$92K</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--sage-deep);">Very High</div>
+      </div>
+      <div style="background: var(--linen-warm); border-radius: 20px; height: 10px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, var(--sage) 0%, var(--sage-deep) 100%); height: 100%; width: 85%; border-radius: 20px;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Regional banks — HomeTrust, South State, First Horizon. They hire fast and value your BofA pedigree.</div>
+    </div>
+
+    <!-- bar 2 -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">$95–$105K</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--sage-deep);">High</div>
+      </div>
+      <div style="background: var(--linen-warm); border-radius: 20px; height: 10px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, var(--sage) 0%, var(--sage-deep) 100%); height: 100%; width: 78%; border-radius: 20px;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Mid-tier banks and fintech — Huntington, Ally, AvidXchange, Paymentus. Your sweet spot.</div>
+    </div>
+
+    <!-- bar 3 -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">$105–$115K</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--dusty-blue-deep);">Solid</div>
+      </div>
+      <div style="background: var(--linen-warm); border-radius: 20px; height: 10px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, var(--dusty-blue) 0%, var(--dusty-blue-deep) 100%); height: 100%; width: 55%; border-radius: 20px;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Major banks — Wells, JPM, Truist, Citi. Possible in 3–6 months with the right recruiter intro.</div>
+    </div>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">You haven't wasted a single day</div>
+    <p>Four years as an Officer at Bank of America is not time lost — it's <strong>the foundation everything else gets built on.</strong> In Charlotte banking, BofA tenure carries real weight. Recruiters at every other bank in this city know exactly what Band 5 means. That credibility is already built. You just haven't used it yet.</p>
+  </div>
+
+  <div class="fact">
+    <div class="fact-label">How fast this can move</div>
+    <p>This isn't a 6-month project. Your LinkedIn could be updated by the end of the day. Recruiters search Charlotte for treasury implementation talent <strong>every single week.</strong> Once your profile is live and optimized, you could realistically be getting recruiter messages <strong>within days</strong> — not months. The demand is there right now. The only missing piece is you being visible.</p>
+  </div>
+
+  <div class="accent-block sage" style="margin-bottom: 22px;">
+    <div class="accent-label">Your Real Estate License Matters Too</div>
+    <div class="accent-sub" style="max-width: 360px; font-size: 14px; opacity: 0.85;">You're a licensed Realtor. You know how to read a market. So read this one: the market for your skills in Charlotte is hot, the supply of qualified people is tight, and you're sitting on an asset you haven't listed yet. You'd never let a client underprice their home by $30K. Don't do it to yourself.</div>
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="bottom">
+    <p>
+      You're not behind.<br>
+      You're not starting from scratch.<br>
+      You're in a good spot.<br><br>
+      <strong>You've already done the hard part. Now let's go get what's yours.</strong>
+    </p>
+  </div>
+
+  <div class="quote-block">
+    <p>You're not leaving because you hate your job. You're leaving because the market values you more than your current employer does. That's not disloyal — that's math.</p>
+  </div>
+
+  <!-- VERSE -->
+  <div style="margin-top: 24px; padding: 28px 24px; text-align: center; background: var(--linen-warm); border: 1px solid var(--border); border-radius: var(--radius);">
+    <div style="font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: var(--text-soft); line-height: 1.65; max-width: 340px; margin: 0 auto;">
+      "For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you, plans to give you hope and a future."
+    </div>
+    <div style="font-size: 11px; color: var(--text-muted); margin-top: 12px; letter-spacing: .06em;">
+      Jeremiah 29:11
+    </div>
+  </div>
+
+  <div class="lily-divider" style="padding-top: 20px;">✿</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     CHITTY CHAT SECTION
+═══════════════════════════════════════ -->
+<div class="chitty-section">
+
+  <div class="chitty-header">
+    <div class="chitty-tag">When You're Ready</div>
+    <div class="chitty-title">The Chitty Chat ✿</div>
+    <div class="chitty-sub">This is the fun part. No forms. No applications. Just you talking into your phone like you're telling a story at happy hour.</div>
+  </div>
+
+  <!-- VOICE MEMO STEPS -->
+  <div class="vm-steps">
+    <div class="vm-steps-title">How This Works</div>
+
+    <div class="vm-step">
+      <div class="vm-num">1</div>
+      <div class="vm-text">Open the <strong>Voice Memos</strong> app on your iPhone. It's the one with the little red soundwave. It's already on your phone.</div>
+    </div>
+
+    <div class="vm-step">
+      <div class="vm-num">2</div>
+      <div class="vm-text">Hit the red button. <strong>Start talking.</strong> That's it. Don't stop and start. Don't try to sound professional. Don't edit yourself. Just ramble.</div>
+    </div>
+
+    <div class="vm-step">
+      <div class="vm-num">3</div>
+      <div class="vm-text">Leave the recorder going in the background. <strong>Read a question below, then just talk.</strong> If your mind drifts — follow it. If a random work story pops up, go with it. If you think "that's not important" — it probably is. <strong>The more you chitty chat, the better this works.</strong></div>
+    </div>
+
+    <div class="vm-step">
+      <div class="vm-num">4</div>
+      <div class="vm-text">When you're done (3 minutes, 10 minutes, doesn't matter), <strong>send the voice memo to Phil.</strong> Text it, AirDrop it, whatever. Done.</div>
+    </div>
+
+    <div class="vm-step">
+      <div class="vm-num">5</div>
+      <div class="vm-text"><strong>Phil handles everything else.</strong> You'll get back finished copy. You paste it into LinkedIn. That's the whole plan.</div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="rules-card">
+    <div class="rules-title">The Only Rules</div>
+    <ul class="rules-list">
+      <li>Don't overthink it</li>
+      <li>Don't edit yourself</li>
+      <li>Don't worry about being "on topic"</li>
+      <li>Messy is perfect. Rambling is perfect.</li>
+      <li>Talk like you're venting to a friend at happy hour</li>
+      <li>If you go off on a tangent, that's usually the gold</li>
+    </ul>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="q-intro">
+    Tap any question to see what to think about. You don't have to answer all of them — even 2 or 3 is plenty. ✿
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">1</div>
+      <div class="q-drop-question">Who comes to you when things go sideways?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">When someone on your team is stuck or a client is frustrated — are you the one they come to? Think of a recent time. What happened? What did you do? Just tell the story like you're telling me over drinks.</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">2</div>
+      <div class="q-drop-question">What do you do that's technically not your job?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">The stuff you handle that nobody asked you to handle — but if you stopped doing it, things would fall apart. What is that for you? Even the small things count.</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">3</div>
+      <div class="q-drop-question">Tell me about the "helps too much" thing.</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">Your only year-end critique was that you help too much. I love that. Tell me about a time that happened — where you jumped in to save something and it cost you time on your own stuff. What was the situation?</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">4</div>
+      <div class="q-drop-question">Walk me through a messy client situation.</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">Think of an implementation that got complicated. What was the product? What went sideways? How did you get it across the finish line? The messier the starting point, the better the story.</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">5</div>
+      <div class="q-drop-question">What did you build that's still being used?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">A process, a template, a checklist, a way of doing things — anything at the bank that existed in chaos before you and has structure now because you built it. Even something small.</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">6</div>
+      <div class="q-drop-question">Has a client ever asked for you by name?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">A client who specifically requested you, or a relationship you saved when things were going south. What happened? What did you do that went beyond the normal playbook?</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">7</div>
+      <div class="q-drop-question">What would your favorite manager say about you?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">If they had 30 seconds to tell someone why they should hire you — not the polite version, the real version — what would they say? What's the thing they'd fight to keep you for?</div>
+    </div>
+  </div>
+
+  <div class="q-drop" onclick="this.classList.toggle('open')">
+    <div class="q-drop-header">
+      <div class="q-drop-num">✿</div>
+      <div class="q-drop-question">What are you most proud of that nobody knows?</div>
+      <div class="q-drop-arrow">▾</div>
+    </div>
+    <div class="q-drop-body">
+      <div class="q-drop-hint">The thing about your work you're most proud of that nobody outside your immediate team would ever know about. The quiet wins. Those are usually the best ones.</div>
+    </div>
+  </div>
+
+  <!-- SEND IT -->
+  <div class="send-card">
+    <h3>That's It. Send the Ramble.</h3>
+    <p>However long, however messy. Voice memo, wall of text, whatever. Phil turns it into magic. You copy, paste, and wait.</p>
+  </div>
+
+  <div class="lily-divider" style="padding-top: 24px;">✿</div>
+
+  <div class="source">
+    Data: Indeed · Salary.com · Robert Half · Glassdoor · ZipRecruiter · LinkedIn · 2025–2026
+  </div>
+
+</div>
+
+<script>
+// Ensure only one dropdown open at a time on mobile for cleaner UX
+// (Optional — they can all be independent too)
+</script>
+
+</body>
+</html>
