@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiring Scorecard — Hritsko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; padding-bottom: 80px; }
+
+  /* BANNER */
+  .banner { background: #0c0c0c; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; }
+  .banner img { height: 28px; }
+  .banner-meta { text-align: right; }
+  .banner-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: .08em; }
+  .banner-version { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: .08em; display: block; }
+
+  /* NAV */
+  .nav { background: #fff; border-bottom: 1px solid #e2e1dc; position: sticky; top: 64px; z-index: 99; display: flex; padding: 0 28px; }
+  .nav-tab { font-size: 13px; font-weight: 500; color: #8a8a85; padding: 14px 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+  .nav-tab:hover { color: #1a1a1a; }
+  .nav-tab.active { color: #1a1a1a; border-bottom-color: #0c0c0c; }
+
+  /* CONTENT */
+  .tab-content { display: none; max-width: 900px; margin: 0 auto; padding: 36px 28px; }
+  .tab-content.active { display: block; }
+
+  /* SECTION */
+  .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #b8b7b2; margin-bottom: 6px; }
+  .section-title { font-size: 16px; font-weight: 600; color: #1a1a1a; padding-bottom: 10px; border-bottom: 1px solid #e2e1dc; margin-bottom: 20px; }
+
+  /* CARDS */
+  .card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .card-sm { background: #fff; border: 1px solid #e2e1dc; border-radius: 8px; padding: 14px 16px; }
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+  /* CALLOUTS */
+  .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 14px; }
+  .callout-green { border-color: #25a05e; background: #eaf5f0; color: #1a6e42; }
+  .callout-blue { border-color: #2e6cc4; background: #eaf0f9; color: #1a4f8a; }
+  .callout-amber { border-color: #c8880e; background: #fdf5e6; color: #7a4d08; }
+  .callout-red { border-color: #cc3333; background: #fdf0f0; color: #8a1f1f; }
+  .callout-purple { border-color: #6e48c0; background: #f2eefb; color: #4a2880; }
+  .callout-teal { border-color: #1a9090; background: #e8f6f6; color: #0d5c5c; }
+  .callout strong { display: block; margin-bottom: 3px; }
+
+  /* TABLES */
+  .table-wrap { border: 1px solid #e2e1dc; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { background: #0c0c0c; }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); padding: 11px 14px; text-align: left; letter-spacing: .06em; text-transform: uppercase; font-weight: 400; }
+  tbody tr { border-bottom: 1px solid #e2e1dc; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f5f4f0; }
+  tbody td { padding: 11px 14px; font-size: 13px; color: #4a4948; vertical-align: top; }
+  td.key { font-weight: 500; color: #1a1a1a; }
+  td.mono { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8a8a85; }
+  td.example { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1a4f8a; }
+
+  /* SCORE TABLE */
+  .score-section-header { background: #0c0c0c !important; }
+  .score-section-header td { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.4) !important; letter-spacing: .12em; text-transform: uppercase; padding: 8px 14px !important; font-weight: 400; }
+  .score-row td { padding: 13px 14px; }
+  .score-label { font-weight: 500; color: #1a1a1a !important; font-size: 13px; }
+  .score-desc { font-size: 12px; color: #8a8a85 !important; margin-top: 3px; }
+  .score-boxes { display: flex; gap: 6px; }
+  .score-box { width: 34px; height: 34px; border: 1px solid #e2e1dc; border-radius: 6px; background: #f5f4f0; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: #8a8a85; cursor: pointer; transition: all 0.15s; }
+  .score-box:hover { border-color: #0c0c0c; color: #1a1a1a; }
+  .score-box.selected { background: #0c0c0c; color: #fff; border-color: #0c0c0c; }
+  .notes-field { width: 100%; border: 1px solid #e2e1dc; border-radius: 6px; padding: 7px 10px; font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a1a; background: #fafaf8; resize: none; outline: none; }
+  .notes-field:focus { border-color: #8a8a85; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; border: 1px solid; }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge-green { color: #1a6e42; background: #eaf5f0; border-color: #a8dcc0; } .badge-green::before { background: #25a05e; }
+  .badge-amber { color: #7a4d08; background: #fdf5e6; border-color: #f0d080; } .badge-amber::before { background: #c8880e; }
+  .badge-red { color: #8a1f1f; background: #fdf0f0; border-color: #f0aaaa; } .badge-red::before { background: #cc3333; }
+  .badge-blue { color: #1a4f8a; background: #eaf0f9; border-color: #a8c4e8; } .badge-blue::before { background: #2e6cc4; }
+
+  /* META FIELDS */
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .meta-field { background: #fff; border: 1px solid #e2e1dc; border-radius: 8px; padding: 12px 14px; }
+  .meta-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .meta-input { width: 100%; border: none; border-bottom: 1px solid #e2e1dc; padding: 4px 0; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #1a1a1a; background: transparent; outline: none; }
+  .meta-input:focus { border-bottom-color: #0c0c0c; }
+
+  /* TOTAL */
+  .total-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  .total-card { background: #fff; border: 1px solid #e2e1dc; border-radius: 10px; padding: 18px 20px; }
+  .total-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #b8b7b2; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+  .total-score { font-size: 36px; font-weight: 600; color: #0c0c0c; font-family: 'IBM Plex Mono', monospace; }
+  .total-denom { font-size: 16px; color: #8a8a85; }
+  .total-scale { font-size: 12px; color: #8a8a85; margin-top: 6px; }
+
+  /* RECOMMENDATION BUTTONS */
+  .rec-buttons { display: flex; gap: 10px; margin-top: 10px; }
+  .rec-btn { padding: 8px 16px; border: 1px solid #e2e1dc; border-radius: 6px; font-size: 13px; font-weight: 500; color: #4a4948; cursor: pointer; background: #fff; transition: all 0.15s; }
+  .rec-btn:hover { border-color: #0c0c0c; color: #0c0c0c; }
+  .rec-btn.selected-hire { background: #0c0c0c; color: #fff; border-color: #0c0c0c; }
+  .rec-btn.selected-second { background: #fdf5e6; color: #7a4d08; border-color: #f0d080; }
+  .rec-btn.selected-pass { background: #fdf0f0; color: #8a1f1f; border-color: #f0aaaa; }
+
+  /* DQ LIST */
+  .dq-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0efea; }
+  .dq-item:last-child { border-bottom: none; }
+  .dq-dot { width: 6px; height: 6px; border-radius: 50%; background: #cc3333; margin-top: 7px; flex-shrink: 0; }
+
+  /* FOOTER */
+  .footer { background: #0c0c0c; position: fixed; bottom: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+  .footer span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.25); }
+
+  @media print {
+    .nav, .footer { display: none; }
+    .banner { position: relative; }
+    .tab-content { display: block !important; padding-top: 16px; }
+    body { padding-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <img src="data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==" alt="Hritsko">
+  <div class="banner-meta">
+    <span class="banner-title">HIRING SCORECARD</span>
+    <span class="banner-version">v1.0 · Internal Use Only</span>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('scorecard', this)">Scorecard</div>
+  <div class="nav-tab" onclick="showTab('disqualifiers', this)">Disqualifiers</div>
+  <div class="nav-tab" onclick="showTab('reference', this)">Reference</div>
+</div>
+
+<!-- TAB: SCORECARD -->
+<div class="tab-content active" id="tab-scorecard">
+
+  <div class="meta-grid">
+    <div class="meta-field">
+      <div class="meta-label">Candidate Name</div>
+      <input class="meta-input" type="text" placeholder="Full name">
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Interview Date</div>
+      <input class="meta-input" type="text" placeholder="MM / DD / YYYY">
+    </div>
+    <div class="meta-field">
+      <div class="meta-label">Interviewed By</div>
+      <input class="meta-input" type="text" placeholder="Name">
+    </div>
+  </div>
+
+  <div class="section-label">Assessment</div>
+  <div class="section-title">Scoring Criteria</div>
+  <p style="font-size:13px; color:#4a4948; margin-bottom:20px;">Rate each criterion 1–5. Click a box to select. Add notes in the right column.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:38%">Criterion</th>
+          <th style="width:24%">Score</th>
+          <th style="width:38%">Notes</th>
+        </tr>
+      </thead>
+      <tbody id="score-table-body">
+        <!-- RELIABILITY -->
+        <tr class="score-section-header"><td colspan="3">Reliability</td></tr>
+        <tr class="score-row" data-criterion="reliability-1">
+          <td><div class="score-label">Shows Up Consistently</div><div class="score-desc">Job history, no unexplained gaps, stable tenure</div></td>
+          <td><div class="score-boxes" data-id="r1"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Transportation Confirmed</div><div class="score-desc">Reliable way to get here every shift, no conditions</div></td>
+          <td><div class="score-boxes" data-id="r2"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Schedule Fit</div><div class="score-desc">Available for the exact shift without negotiation</div></td>
+          <td><div class="score-boxes" data-id="r3"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <!-- DETAIL -->
+        <tr class="score-section-header"><td colspan="3">Attention to Detail</td></tr>
+        <tr class="score-row">
+          <td><div class="score-label">Catches Own Errors</div><div class="score-desc">Described a time they caught a mistake before it mattered</div></td>
+          <td><div class="score-boxes" data-id="d1"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Asks, Doesn't Guess</div><div class="score-desc">Questions when unclear rather than assuming and moving on</div></td>
+          <td><div class="score-boxes" data-id="d2"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Follows Process</div><div class="score-desc">Comfortable with structured, repetitive, step-based work</div></td>
+          <td><div class="score-boxes" data-id="d3"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <!-- PACE -->
+        <tr class="score-section-header"><td colspan="3">Pace + Work Ethic</td></tr>
+        <tr class="score-row">
+          <td><div class="score-label">Steady Under Pressure</div><div class="score-desc">Describes a method, not just "I work harder"</div></td>
+          <td><div class="score-boxes" data-id="p1"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Doesn't Cut Corners</div><div class="score-desc">Maintains accuracy when volume increases</div></td>
+          <td><div class="score-boxes" data-id="p2"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <!-- ATTITUDE -->
+        <tr class="score-section-header"><td colspan="3">Attitude</td></tr>
+        <tr class="score-row">
+          <td><div class="score-label">Accountability</div><div class="score-desc">Owns mistakes, doesn't deflect or blame others</div></td>
+          <td><div class="score-boxes" data-id="a1"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">No Drama</div><div class="score-desc">Stable, calm, not reactive in conversation</div></td>
+          <td><div class="score-boxes" data-id="a2"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+        <tr class="score-row">
+          <td><div class="score-label">Wants to Do It Right</div><div class="score-desc">Intrinsically motivated by quality, not just task completion</div></td>
+          <td><div class="score-boxes" data-id="a3"></div></td>
+          <td><textarea class="notes-field" rows="2" placeholder="Observations…"></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="total-bar">
+    <div class="total-card">
+      <div class="total-label">Total Score</div>
+      <div><span class="total-score" id="live-score">0</span><span class="total-denom"> / 55</span></div>
+      <div class="total-scale">45–55 = Strong hire &nbsp;·&nbsp; 30–44 = Consider &nbsp;·&nbsp; &lt;30 = Pass</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Recommendation</div>
+      <div class="rec-buttons">
+        <button class="rec-btn" onclick="selectRec(this,'selected-hire')">Hire</button>
+        <button class="rec-btn" onclick="selectRec(this,'selected-second')">Second Interview</button>
+        <button class="rec-btn" onclick="selectRec(this,'selected-pass')">Pass</button>
+      </div>
+      <div style="margin-top:12px; font-size:12px; color:#8a8a85; font-style:italic;">Gut check: Would you want this person next to you on a hard day?</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB: DISQUALIFIERS -->
+<div class="tab-content" id="tab-disqualifiers">
+
+  <div class="section-label">Pre-Screen</div>
+  <div class="section-title">Instant Disqualifiers</div>
+
+  <div class="callout callout-red">
+    <strong>Any one of these = end the conversation.</strong>
+    These aren't negotiable. Don't rationalize exceptions at this stage.
+  </div>
+
+  <div class="card">
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">2+ jobs in the last 12 months with no explanation.</span><br><span style="font-size:12px;color:#8a8a85">Short tenure with no clear reason = pattern, not circumstance.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">Can't start within 1 week.</span><br><span style="font-size:12px;color:#8a8a85">For Hire 1, urgency matters. The bottleneck is costing the business now.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">Transportation is uncertain or conditional.</span><br><span style="font-size:12px;color:#8a8a85">If they can't confirm how they're getting there, reliability is already in question.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">Needs flexible scheduling when the role is fixed-shift.</span><br><span style="font-size:12px;color:#8a8a85">The operation runs on a schedule. If they can't commit, the role doesn't fit.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">Asks about PTO or benefits before asking about the role.</span><br><span style="font-size:12px;color:#8a8a85">Signals priorities that don't align with an early-stage team.</span></div></div>
+    <div class="dq-item"><div class="dq-dot"></div><div><span style="font-weight:500">Excessive phone use during the interview.</span><br><span style="font-size:12px;color:#8a8a85">Floor work requires presence. This is a preview of on-shift behavior.</span></div></div>
+  </div>
+
+  <div class="section-label" style="margin-top:28px">Soft Flags</div>
+  <div class="section-title">Watch For — Not Automatic Disqualifiers</div>
+  <p style="font-size:13px;color:#4a4948;margin-bottom:16px;">These don't end the interview, but they require direct follow-up.</p>
+
+  <div class="callout callout-amber">
+    <strong>Vague answers across the board.</strong>
+    If every answer is "I just did what was needed" with no specifics, there's nothing to evaluate. Push for one concrete example before moving on.
+  </div>
+  <div class="callout callout-amber">
+    <strong>Overconfident about pace without acknowledging accuracy.</strong>
+    Speed without care is worse than slow and accurate at this stage.
+  </div>
+  <div class="callout callout-amber">
+    <strong>Can't name a mistake they've made.</strong>
+    Everyone makes mistakes. Someone who can't name one either doesn't reflect or doesn't tell the truth.
+  </div>
+
+</div>
+
+<!-- TAB: REFERENCE -->
+<div class="tab-content" id="tab-reference">
+
+  <div class="section-label">Scoring</div>
+  <div class="section-title">Score Interpretation</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:20%">Range</th><th style="width:25%">Rating</th><th>What It Means</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">45 – 55</td><td><span class="badge badge-green">Strong Hire</span></td><td class="key">Move fast. Candidate matches criteria across all categories. Reliability is confirmed.</td></tr>
+        <tr><td class="mono">30 – 44</td><td><span class="badge badge-amber">Consider</span></td><td>One or two areas of concern. Identify which categories are low before deciding. Reliability must still be solid.</td></tr>
+        <tr><td class="mono">&lt; 30</td><td><span class="badge badge-red">Pass</span></td><td>Multiple weak areas. Not worth the ramp risk at this stage. Keep sourcing.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-purple" style="margin-top:24px">
+    <strong>A low score in Reliability overrides everything else.</strong>
+    A 50/55 with a score of 1 on "Shows Up Consistently" is not a hire. Reliability is the non-negotiable floor — all other skills are trainable.
+  </div>
+
+  <div class="section-label" style="margin-top:28px">Usage</div>
+  <div class="section-title">How to Use This Scorecard</div>
+
+  <div class="card-grid">
+    <div class="card-sm">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Before the Interview</div>
+      <p style="font-size:13px;color:#4a4948">Print one copy per candidate. Complete the meta fields (name, date, interviewer) before they walk in. Do not score during the phone screen — this is for in-person only.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">During the Interview</div>
+      <p style="font-size:13px;color:#4a4948">Score each criterion as you go. Use the notes column for specific phrases or examples they gave. Don't wait until after — details fade fast.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">After the Interview</div>
+      <p style="font-size:13px;color:#4a4948">Tally the score and make the recommendation call within 30 minutes. File the scorecard in /Candidates/. One physical copy per candidate if printing.</p>
+    </div>
+    <div class="card-sm">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b8b7b2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Version History</div>
+      <p style="font-size:13px;color:#4a4948">v1.0 — Initial release. Criteria tuned for Packaging + Fulfillment Generalist role. Revise criteria if role changes significantly.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>Hritsko Hiring Scorecard · v1.0 · Internal Use Only</span>
+  <span id="footer-date"></span>
+</div>
+
+<script>
+  // Logo injection
+  document.querySelector('.banner img').src = 'data:image/png;base64,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L1Eq8k5KW/SqTbocGDMICph9P90r8wftQYC1/KB6mSNLsdGm9PmUOVWrLben0IVky8shQWkK9RWtKcD7qVesZwfHqq1Rn6vUpip1SdmJ2dmVlx+YfcK3HFHpKlHiTHlgHEW19XaZ+Ua+AR0I59tfV2mflGvgEdCAIVXqVY96v6jXM+xaFwOtOVebWhaKa8pKkl5RBBCeII64apBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAKK5hX12LuPut7wwcwr67F3H3W94YbrBAeG3kqRQKchaSlSZVoEEYIO4OEe6CCA//2Q==';
+
+  // Tab navigation
+  function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  // Score boxes
+  function buildScoreBoxes() {
+    document.querySelectorAll('.score-boxes').forEach(container => {
+      const id = container.dataset.id;
+      for (let i = 1; i <= 5; i++) {
+        const box = document.createElement('div');
+        box.className = 'score-box';
+        box.textContent = i;
+        box.dataset.val = i;
+        box.addEventListener('click', function() {
+          container.querySelectorAll('.score-box').forEach(b => b.classList.remove('selected'));
+          this.classList.add('selected');
+          updateTotal();
+        });
+        container.appendChild(box);
+      }
+    });
+  }
+
+  function updateTotal() {
+    let total = 0;
+    document.querySelectorAll('.score-box.selected').forEach(b => { total += parseInt(b.dataset.val); });
+    document.getElementById('live-score').textContent = total;
+    const el = document.getElementById('live-score');
+    if (total >= 45) el.style.color = '#1a6e42';
+    else if (total >= 30) el.style.color = '#7a4d08';
+    else if (total > 0) el.style.color = '#8a1f1f';
+    else el.style.color = '#0c0c0c';
+  }
+
+  function selectRec(btn, cls) {
+    document.querySelectorAll('.rec-btn').forEach(b => b.className = 'rec-btn');
+    btn.classList.add(cls);
+  }
+
+  // Footer date
+  document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+
+  buildScoreBoxes();
+</script>
+</body>
+</html>
